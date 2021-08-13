@@ -87,11 +87,15 @@ class DataSet(object):
             font            =   os.path.join(data_dir,"english","fonts","English.ttf")
             all_fonts       =   [fpath for fpath in glob(os.path.join(data_dir,"english","fonts","*.ttf"))]
 
+        class symbols:
+            dir   =   os.path.join(data_dir,"symbols","symbols")
+            csv   =   os.path.join(data_dir,"symbols","symbols.csv")
 
 
         # assign
         self.bangla     = bangla
         self.english    = english
+        self.symbols    = symbols
         # error check
         self.__checkExistance()
         
@@ -133,7 +137,8 @@ class DataSet(object):
             self.bangla.gvocab=[""]+self.bangla.punctuations+self.bangla.number_values+self.known_graphemes
             self.bangla.ffvocab=self.bangla.sel_puntcs+self.bangla.number_values+self.known_graphemes
 
-
+        self.symbols.df    =self.__getDataFrame(self.symbols.csv)
+            
 
 
 
@@ -157,7 +162,9 @@ class DataSet(object):
             assert os.path.exists(self.bangla.numbers.csv),"Bangla numbers csv not found"
             assert os.path.exists(self.bangla.dictionary_csv),"Bangla dictionary csv not found"
             assert os.path.exists(self.bangla.font),"Bangla.ttf font not found"
-
+        assert os.path.exists(self.symbols.dir),"Bangla graphemes dir not found"
+        assert os.path.exists(self.symbols.csv),"Bangla graphemes csv not found"
+            
             
         LOG_INFO("All paths found",mcolor="green")
     

@@ -18,7 +18,7 @@ tqdm.pandas()
 #--------------------
 # helpers
 #--------------------
-def createImgFromComps(df,comps,pad):
+def createImgFromComps(df,comps,pad,numbers_only=False):
     '''
         creates a synthetic image from given comps
         args:
@@ -30,9 +30,13 @@ def createImgFromComps(df,comps,pad):
                                 double_pad_dim
                                 top
                                 bot
+            numbers_only    :       use only numbers
         returns:
             non-pad-corrected raw binary image
     '''
+    if numbers_only:
+        if random.choice([1,0])==1:
+            comps+=["/","="]
     # get img_paths
     img_paths=[]
     for comp in comps:
@@ -157,7 +161,8 @@ def saveDictionary(dictionary,
                    img_dim, 
                    pad,
                    font,
-                   comp_dim):
+                   comp_dim,
+                   numbers_only=False):
     '''
         saves a dictionary data with img tgt and data.csv with grapheme labels
         args:
@@ -176,39 +181,43 @@ def saveDictionary(dictionary,
                                         bot
             font            :       font to use
             comp_dim        :       component height base
+            numbers_only    :       use only numbers
     '''
     # dataframe vars
     filename=[]
     labels=[]
     imasks=[]
-    tmasks=[]
     # loop
     for idx in tqdm(range(len(dictionary))):
         try:
             comps=dictionary.iloc[idx,1]
+            
             # image
             img=createImgFromComps(df=compdf,
                                 comps=comps,
-                                pad=pad)
-            # target
-            tgt=createTgtFromComps(font=font,
-                                comps=comps,
-                                min_dim=comp_dim)
+                                pad=pad,numbers_only=numbers_only)
+            #-----------------------------
+            # add noise
+            #-----------------------------
+            img=cv2.merge((img,img,img))
+            img=noisy(img)
+            img=boxnoise(img,use_random_lines=True)
+            img=np.squeeze(img[:,:,0])
+            
+
 
             # correct padding
             img,imask=correctPadding(img,img_dim,ptype="left")
-            tgt,tmask=correctPadding(tgt,img_dim,ptype="left")
             # save
             fname=f"{idx}.png"
             cv2.imwrite(os.path.join(save.img,fname),img)
-            cv2.imwrite(os.path.join(save.tgt,fname),tgt)
             filename.append(fname)
             labels.append(comps)
             imasks.append(imask)
-            tmasks.append(tmask)
+            
         except Exception as e:
             LOG_INFO(e)
-    df=pd.DataFrame({"filename":filename,"labels":labels,"image_mask":imasks,"target_mask":tmasks})
+    df=pd.DataFrame({"filename":filename,"labels":labels,"image_mask":imasks})
     df.to_csv(os.path.join(save.csv),index=False)
 
 def saveFontFacedDictionary(dictionary,
@@ -290,7 +299,6 @@ def saveFontFacedDictionary(dictionary,
 #--------------------
 def createWords(iden,
                 df,
-                img_dir,
                 save_dir,
                 font_path,
                 img_dim,
@@ -302,7 +310,8 @@ def createWords(iden,
                 valid_graphemes=None,
                 num_samples=100000,
                 dict_max_len=10,
-                dict_min_len=1):
+                dict_min_len=1,
+                numbers_only=False):
     '''
         creates: 
             * handwriten word image
@@ -331,17 +340,16 @@ def createWords(iden,
              
             dict_max_len    :       the maximum length of data for randomized dictionary
             dict_min_len    :       the minimum length of data for randomized dictionary
+            numbers_only    :       use only numbers
     '''
     #---------------
     # processing
     #---------------
     save_dir=create_dir(save_dir,iden)
-    # create img_path in df
-    df["img_path"]=df.filename.progress_apply(lambda x:os.path.join(img_dir,f"{x}.bmp")) 
     # save_paths
     class save:    
         img=create_dir(save_dir,"images")
-        tgt=create_dir(save_dir,"targets")
+        #tgt=create_dir(save_dir,"targets")
         csv=os.path.join(save_dir,"data.csv")
     # font 
     font=PIL.ImageFont.truetype(font_path, size=comp_dim)
@@ -367,7 +375,8 @@ def createWords(iden,
                    img_dim=img_dim,
                    pad=pad,
                    font=font,
-                   comp_dim=comp_dim)
+                   comp_dim=comp_dim,
+                   numbers_only=numbers_only)
 
 
 def createFontFacedWords(iden,

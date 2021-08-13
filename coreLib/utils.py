@@ -765,7 +765,7 @@ def noisy(image):
         return noisy
 
 #-----------------------------------------------------------------------
-def boxnoise(img):
+def boxnoise(img,use_random_lines=False):
     h,w,c=img.shape
     x_min=2
     y_min=0
@@ -782,4 +782,12 @@ def boxnoise(img):
         cv2.rectangle(img,(x_min,y_min),(x_max,y_min),(0,0,0),lwidth)
     if random.choice([1,0])==1:
         cv2.rectangle(img,(x_min,y_max),(x_max,y_max),(0,0,0),lwidth)
+
+    if use_random_lines:
+        if random.choice([0,1])==1:
+            x_min=random.randint(0,(x_max-x_min)//2)
+            cv2.rectangle(img,(x_min,y_min),(x_min,y_max),(0,0,0),lwidth)
+        else:
+            y_min=random.randint(0,(y_max-y_min)//2)
+            cv2.rectangle(img,(x_min,y_min),(x_max,y_min),(0,0,0),lwidth)
     return img 
