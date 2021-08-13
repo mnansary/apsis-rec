@@ -71,7 +71,7 @@ if __name__=="__main__":
     parser.add_argument("--img_height",required=False,default=64,help ="height for each grapheme: default=64")
     parser.add_argument("--img_width",required=False,default=512,help ="width dimension of word images: default=512")
     parser.add_argument("--num_samples",required=False,default=100000,help ="number of samples to create when not using dictionary:default=100000")
-    parser.add_argument("--dict_max_len",required=False,default=20,help ="max number of graphemes in a word:default=20")
+    parser.add_argument("--dict_max_len",required=False,default=10,help ="max number of graphemes in a word:default=20")
     
     args = parser.parse_args()
     main(args)

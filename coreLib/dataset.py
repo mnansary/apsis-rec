@@ -65,7 +65,7 @@ class DataSet(object):
 
             dictionary_csv  =   os.path.join(data_dir,"bangla","dictionary.csv")    
             font            =   os.path.join(data_dir,"bangla","fonts","Bangla.ttf")
-            all_fonts       =   [fpath for fpath in glob(os.path.join(data_dir,"bangla","fonts","*.ttf")) if "ANSI" not in fpath]
+            all_fonts       =   [fpath for fpath in glob(os.path.join(data_dir,"bangla","fonts","*.ttf")) if "ANSI" not in fpath and "Lohit" not in fpath]
 
 
         class english:
