@@ -11,7 +11,7 @@ import numpy as np
 import random
 import pandas as pd 
 from tqdm import tqdm
-from .utils import LOG_INFO, correctPadding,create_dir,stripPads
+from .utils import LOG_INFO, correctPadding,create_dir,stripPads,noisy,boxnoise
 import PIL
 import PIL.Image , PIL.ImageDraw , PIL.ImageFont 
 tqdm.pandas()
@@ -234,49 +234,52 @@ def saveFontFacedDictionary(dictionary,
     filename=[]
     labels=[]
     imasks=[]
-    tmasks=[]
     # loop
     for idx in tqdm(range(len(dictionary))):
         try:
             comps=dictionary.iloc[idx,1]
-            
+            if random.choice([1,0])==1:
+                comps=[comp.upper() for comp in comps]
             # resolution based font
             image_font_path=random.choice(all_fonts)
-            res=random.choice(["low","mid"])
-            if res=="low":
-                image_font_size=comp_dim//4
-            elif res=="mid":
-                image_font_size=comp_dim//2
-            image_font=font=PIL.ImageFont.truetype(image_font_path, size=image_font_size)
+            image_font=PIL.ImageFont.truetype(image_font_path, size=comp_dim)
             # image            
             img=createTgtFromComps(font=image_font,
-                                   comps=comps,
-                                   min_dim=image_font_size)
+                                    comps=comps,
+                                    min_dim=comp_dim)
 
             # resize (heigh based)
             _h,_w=img.shape 
             _width= int(comp_dim* _w/_h) 
             img=cv2.resize(img,(_width,comp_dim),fx=0,fy=0, interpolation = cv2.INTER_NEAREST)
             
-            # target
-            tgt=createTgtFromComps(font=font,
-                                comps=comps,
-                                min_dim=comp_dim)
+            #-----------------------------
+            # add noise
+            #-----------------------------
+            img=cv2.merge((img,img,img))
+            img=noisy(img)
+            img=boxnoise(img)
+            img=np.squeeze(img[:,:,0])
+            # # target
+            # tgt=createTgtFromComps(font=font,
+            #                     comps=comps,
+            #                     min_dim=comp_dim)
 
             # correct padding
             img,imask=correctPadding(img,img_dim,ptype="left")
-            tgt,tmask=correctPadding(tgt,img_dim,ptype="left")
+            #tgt,tmask=correctPadding(tgt,img_dim,ptype="left")
             # save
             fname=f"{idx}.png"
             cv2.imwrite(os.path.join(save.img,fname),img)
-            cv2.imwrite(os.path.join(save.tgt,fname),tgt)
+            #cv2.imwrite(os.path.join(save.tgt,fname),tgt)
             filename.append(fname)
+            comps=[comp.lower() for comp in comps]
             labels.append(comps)
             imasks.append(imask)
-            tmasks.append(tmask)
+            #tmasks.append(tmask)
         except Exception as e:
-            LOG_INFO(e)
-    df=pd.DataFrame({"filename":filename,"labels":labels,"image_mask":imasks,"target_mask":tmasks})
+            pass
+    df=pd.DataFrame({"filename":filename,"labels":labels,"image_mask":imasks})
     df.to_csv(os.path.join(save.csv),index=False)
 
 
@@ -401,7 +404,7 @@ def createFontFacedWords(iden,
     # save_paths
     class save:    
         img=create_dir(save_dir,"images")
-        tgt=create_dir(save_dir,"targets")
+        #tgt=create_dir(save_dir,"targets")
         csv=os.path.join(save_dir,"data.csv")
     # font 
     font=PIL.ImageFont.truetype(font_path, size=comp_dim)
