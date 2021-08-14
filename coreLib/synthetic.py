@@ -418,7 +418,7 @@ def createFontFacedWords(iden,
         csv=os.path.join(save_dir,"data.csv")
     # font 
     font=PIL.ImageFont.truetype(font_path, size=comp_dim)
-    if dictionary==None:
+    if dictionary is None:
         dictionary=createRandomDictionary(valid_graphemes,dict_max_len,dict_min_len,num_samples)
     else:
         dictionary=dictionary.sample(frac=1)
