@@ -35,7 +35,7 @@ def main(args):
     # dataset object
     ds=DataSet(data_dir=data_path,check_english=True)
     LOG_INFO("Creating english fontfaced data")
-    createFontFacedWords(iden="english.fontfaced",
+    createFontFacedWords(iden="en.ffd",
                         save_dir=save_path,
                         all_fonts=ds.english.all_fonts,
                         font_path=ds.english.font,
@@ -43,11 +43,22 @@ def main(args):
                         comp_dim=img_height,
                         valid_graphemes=ds.english.ffvocab,
                         num_samples=num_samples,
+                        dict_max_len=dict_max_len,
+                        dictionary=ds.bangla.dictionary)
+    
+    createFontFacedWords(iden="en.ffn",
+                        save_dir=save_path,
+                        all_fonts=ds.english.all_fonts,
+                        font_path=ds.english.font,
+                        img_dim=(img_height,img_width),
+                        comp_dim=img_height,
+                        valid_graphemes=ds.english.number_values+ds.english.letters,
+                        num_samples=num_samples//2,
                         dict_max_len=dict_max_len)
     
     ds=DataSet(data_dir=data_path,check_english=False)
     LOG_INFO("Creating bangla fontfaced data")
-    createFontFacedWords(iden="bangla.fontfaced",
+    createFontFacedWords(iden="bn.ffd",
                         save_dir=save_path,
                         all_fonts=ds.bangla.all_fonts,
                         font_path=ds.bangla.font,
@@ -55,6 +66,16 @@ def main(args):
                         comp_dim=img_height,
                         valid_graphemes=ds.bangla.ffvocab,
                         num_samples=num_samples,
+                        dict_max_len=dict_max_len,
+                        dictionary=ds.bangla.dictionary)
+    createFontFacedWords(iden="bn.ffn",
+                        save_dir=save_path,
+                        all_fonts=ds.bangla.all_fonts,
+                        font_path=ds.bangla.font,
+                        img_dim=(img_height,img_width),
+                        comp_dim=img_height,
+                        valid_graphemes=ds.bangla.number_values+ds.known_graphemes,
+                        num_samples=num_samples//2,
                         dict_max_len=dict_max_len)
     
 
@@ -70,8 +91,8 @@ if __name__=="__main__":
     parser.add_argument("save_path", help="Path of the directory to save the dataset")
     parser.add_argument("--img_height",required=False,default=64,help ="height for each grapheme: default=64")
     parser.add_argument("--img_width",required=False,default=512,help ="width dimension of word images: default=512")
-    parser.add_argument("--num_samples",required=False,default=100000,help ="number of samples to create when not using dictionary:default=100000")
-    parser.add_argument("--dict_max_len",required=False,default=10,help ="max number of graphemes in a word:default=20")
+    parser.add_argument("--num_samples",required=False,default=50000,help ="number of samples to create when not using dictionary:default=100000")
+    parser.add_argument("--dict_max_len",required=False,default=30,help ="max number of graphemes in a word:default=20")
     
     args = parser.parse_args()
     main(args)

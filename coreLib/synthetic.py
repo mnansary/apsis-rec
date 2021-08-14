@@ -388,7 +388,8 @@ def createFontFacedWords(iden,
                         valid_graphemes,
                         num_samples=100000,
                         dict_max_len=10,
-                        dict_min_len=1):
+                        dict_min_len=1,
+                        dictionary=None):
     '''
         creates: 
             * handwriten word image
@@ -417,8 +418,11 @@ def createFontFacedWords(iden,
         csv=os.path.join(save_dir,"data.csv")
     # font 
     font=PIL.ImageFont.truetype(font_path, size=comp_dim)
-
-    dictionary=createRandomDictionary(valid_graphemes,dict_max_len,dict_min_len,num_samples)
+    if dictionary==None:
+        dictionary=createRandomDictionary(valid_graphemes,dict_max_len,dict_min_len,num_samples)
+    else:
+        dictionary=dictionary.sample(frac=1)
+        dictionary=dictionary.head(num_samples)
     
     # save data
     saveFontFacedDictionary(dictionary=dictionary,
