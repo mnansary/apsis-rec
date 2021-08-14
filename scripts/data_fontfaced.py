@@ -44,7 +44,7 @@ def main(args):
                         valid_graphemes=ds.english.ffvocab,
                         num_samples=num_samples,
                         dict_max_len=dict_max_len,
-                        dictionary=ds.bangla.dictionary)
+                        dictionary=ds.english.dictionary)
     
     createFontFacedWords(iden="en.ffn",
                         save_dir=save_path,
