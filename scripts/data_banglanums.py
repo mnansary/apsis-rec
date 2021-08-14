@@ -70,7 +70,7 @@ if __name__=="__main__":
     parser.add_argument("--img_height",required=False,default=64,help ="height for each grapheme: default=64")
     parser.add_argument("--pad_height",required=False,default=20,help ="pad height for each grapheme for alignment correction: default=20")
     parser.add_argument("--img_width",required=False,default=512,help ="width dimension of word images: default=512")
-    parser.add_argument("--num_samples",required=False,default=100000,help ="number of samples to create when not using dictionary:default=100000")
+    parser.add_argument("--num_samples",required=False,default=50000,help ="number of samples to create when not using dictionary:default=100000")
     args = parser.parse_args()
     main(args)
     
