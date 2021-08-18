@@ -11,7 +11,7 @@ import numpy as np
 import random
 import pandas as pd 
 from tqdm import tqdm
-from .utils import LOG_INFO, correctPadding,create_dir,stripPads,noisy,boxnoise
+from .utils import LOG_INFO, correctPadding,create_dir,noisy,boxnoise
 import PIL
 import PIL.Image , PIL.ImageDraw , PIL.ImageFont 
 tqdm.pandas()
@@ -160,8 +160,6 @@ def saveDictionary(dictionary,
                    save,
                    img_dim, 
                    pad,
-                   font,
-                   comp_dim,
                    numbers_only=False):
     '''
         saves a dictionary data with img tgt and data.csv with grapheme labels
@@ -179,7 +177,6 @@ def saveDictionary(dictionary,
                                         double_pad_dim
                                         top
                                         bot
-            font            :       font to use
             comp_dim        :       component height base
             numbers_only    :       use only numbers
     '''
@@ -203,9 +200,6 @@ def saveDictionary(dictionary,
             img=noisy(img)
             img=boxnoise(img,use_random_lines=True)
             img=np.squeeze(img[:,:,0])
-            
-
-
             # correct padding
             img,imask=correctPadding(img,img_dim,ptype="left")
             # save
@@ -224,7 +218,6 @@ def saveFontFacedDictionary(dictionary,
                             all_fonts, 
                             save,
                             img_dim, 
-                            font,
                             comp_dim):
     '''
         saves a dictionary data with img tgt and data.csv with grapheme labels
@@ -236,7 +229,6 @@ def saveFontFacedDictionary(dictionary,
                                         tgt
                                         csv
             img_dim         :       (img_height,img_width) tuple for final word image
-            font            :       font to use for target
             comp_dim        :       component height base
     '''
     # dataframe vars
@@ -269,23 +261,16 @@ def saveFontFacedDictionary(dictionary,
             img=noisy(img)
             img=boxnoise(img)
             img=np.squeeze(img[:,:,0])
-            # # target
-            # tgt=createTgtFromComps(font=font,
-            #                     comps=comps,
-            #                     min_dim=comp_dim)
-
             # correct padding
             img,imask=correctPadding(img,img_dim,ptype="left")
-            #tgt,tmask=correctPadding(tgt,img_dim,ptype="left")
             # save
             fname=f"{idx}.png"
             cv2.imwrite(os.path.join(save.img,fname),img)
-            #cv2.imwrite(os.path.join(save.tgt,fname),tgt)
             filename.append(fname)
             comps=[comp.lower() for comp in comps]
             labels.append(comps)
             imasks.append(imask)
-            #tmasks.append(tmask)
+            
         except Exception as e:
             pass
     df=pd.DataFrame({"filename":filename,"labels":labels,"image_mask":imasks})
@@ -300,7 +285,6 @@ def saveFontFacedDictionary(dictionary,
 def createWords(iden,
                 df,
                 save_dir,
-                font_path,
                 img_dim,
                 comp_dim,
                 pad_height,
@@ -322,7 +306,6 @@ def createWords(iden,
             df          :       the dataframe that contains filename and label 
             img_dir     :       the directory that holds the images
             save_dir    :       the directory to save the outputs
-            font_path   :       the path of the font to be used
             img_dim         :       (img_height,img_width) tuple for final word image
             comp_dim        :       min component height for each grapheme image
             pad_height      :       the fixed padding height for alignment
@@ -351,8 +334,6 @@ def createWords(iden,
         img=create_dir(save_dir,"images")
         #tgt=create_dir(save_dir,"targets")
         csv=os.path.join(save_dir,"data.csv")
-    # font 
-    font=PIL.ImageFont.truetype(font_path, size=comp_dim)
     # pad
     class pad:
         no_pad_dim      =(comp_dim,comp_dim)
@@ -374,7 +355,6 @@ def createWords(iden,
                    save=save,
                    img_dim=img_dim,
                    pad=pad,
-                   font=font,
                    comp_dim=comp_dim,
                    numbers_only=numbers_only)
 
@@ -382,7 +362,6 @@ def createWords(iden,
 def createFontFacedWords(iden,
                         save_dir,
                         all_fonts,
-                        font_path,
                         img_dim,
                         comp_dim,
                         valid_graphemes,
@@ -416,8 +395,7 @@ def createFontFacedWords(iden,
         img=create_dir(save_dir,"images")
         #tgt=create_dir(save_dir,"targets")
         csv=os.path.join(save_dir,"data.csv")
-    # font 
-    font=PIL.ImageFont.truetype(font_path, size=comp_dim)
+    
     if dictionary is None:
         dictionary=createRandomDictionary(valid_graphemes,dict_max_len,dict_min_len,num_samples)
     else:
@@ -429,5 +407,4 @@ def createFontFacedWords(iden,
                             all_fonts=all_fonts,
                             save=save,
                             img_dim=img_dim,
-                            font=font,
                             comp_dim=comp_dim)
