@@ -355,7 +355,6 @@ def createWords(iden,
                    save=save,
                    img_dim=img_dim,
                    pad=pad,
-                   comp_dim=comp_dim,
                    numbers_only=numbers_only)
 
 
