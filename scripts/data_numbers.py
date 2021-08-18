@@ -19,7 +19,7 @@ from ast import literal_eval
 
 from coreLib.utils import LOG_INFO
 from coreLib.dataset import DataSet
-from coreLib.synthetic import createWords
+from coreLib.synthetic import createWords,createFontFacedWords
 tqdm.pandas()
 #--------------------
 # main
@@ -41,8 +41,9 @@ def main(args):
      
     
     df=pd.concat([ds.bangla.numbers.df,ds.symbols.df])
+    LOG_INFO("Creating bangla numbers data")
     
-    createWords(iden="bn.nums",
+    createWords(iden="synth.bn.nums",
                 df=df,
                 save_dir=save_path,
                 font_path=ds.bangla.font,
@@ -55,6 +56,17 @@ def main(args):
                 valid_graphemes=ds.bangla.number_values,
                 num_samples=num_samples,
                 numbers_only=True)            
+    
+    createFontFacedWords(iden="bn.ffn",
+                        save_dir=save_path,
+                        all_fonts=ds.bangla.all_fonts,
+                        font_path=ds.bangla.font,
+                        img_dim=(img_height,img_width),
+                        comp_dim=img_height,
+                        valid_graphemes=ds.bangla.number_values+ds.known_graphemes,
+                        num_samples=num_samples//2,
+                        dict_max_len=dict_max_len)
+    
 
     
     
