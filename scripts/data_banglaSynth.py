@@ -62,11 +62,7 @@ def main(args):
                 valid_graphemes=ds.bangla.number_values,
                 num_samples=num_samples)            
 
-    # config 
-    config={'gvocab':ds.bangla.gvocab,}
-    with open("../vocab.json", 'w') as fp:
-        json.dump(config, fp,sort_keys=True, indent=4,ensure_ascii=False)
-
+    
     
 #-----------------------------------------------------------------------------------
 

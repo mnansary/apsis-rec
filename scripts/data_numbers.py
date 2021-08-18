@@ -32,6 +32,33 @@ def main(args):
     img_width   =   int(args.img_width)
     pad_height  =   int(args.pad_height)
     num_samples =   int(args.num_samples)
+    ds=DataSet(data_dir=data_path,check_english=True)
+    LOG_INFO("Creating english numbers data")
+    # create img_path in df
+    ds.english.numbers.df["img_path"]=ds.english.numbers.df.filename.progress_apply(lambda x:os.path.join(ds.english.numbers.dir,f"{x}.bmp"))
+    ds.symbols.df["img_path"]=ds.symbols.df.filename.progress_apply(lambda x:os.path.join(ds.symbols.dir,f"{x}.bmp"))  
+    df=pd.concat([ds.english.numbers.df,ds.symbols.df])
+    LOG_INFO("Creating synthetic english numbers data")
+    createWords(iden="synth.en.nums",
+                df=df,
+                save_dir=save_path,
+                img_dim=(img_height,img_width),
+                comp_dim=img_height,
+                pad_height=pad_height,
+                top_exts=[],
+                bot_exts=[],
+                dictionary=None,
+                valid_graphemes=ds.english.number_values,
+                num_samples=num_samples,
+                numbers_only=True)            
+    LOG_INFO("Creating fontfaced english numbers data")
+    createFontFacedWords(iden="font.en.nums",
+                        save_dir=save_path,
+                        all_fonts=ds.english.all_fonts,
+                        img_dim=(img_height,img_width),
+                        comp_dim=img_height,
+                        valid_graphemes=ds.english.number_values,
+                        num_samples=num_samples)
     # dataset object
     ds=DataSet(data_dir=data_path)
     LOG_INFO("Creating bangla numbers data")
@@ -61,33 +88,7 @@ def main(args):
                         valid_graphemes=ds.bangla.number_values,
                         num_samples=num_samples)
     
-    ds=DataSet(data_dir=data_path,check_english=True)
-    LOG_INFO("Creating english numbers data")
-    # create img_path in df
-    ds.english.numbers.df["img_path"]=ds.english.numbers.df.filename.progress_apply(lambda x:os.path.join(ds.english.numbers.dir,f"{x}.bmp"))
-    ds.symbols.df["img_path"]=ds.symbols.df.filename.progress_apply(lambda x:os.path.join(ds.symbols.dir,f"{x}.bmp"))  
-    df=pd.concat([ds.english.numbers.df,ds.symbols.df])
-    LOG_INFO("Creating synthetic english numbers data")
-    createWords(iden="synth.en.nums",
-                df=df,
-                save_dir=save_path,
-                img_dim=(img_height,img_width),
-                comp_dim=img_height,
-                pad_height=pad_height,
-                top_exts=None,
-                bot_exts=None,
-                dictionary=None,
-                valid_graphemes=ds.english.number_values,
-                num_samples=num_samples,
-                numbers_only=True)            
-    LOG_INFO("Creating fontfaced bangla numbers data")
-    createFontFacedWords(iden="font.en.nums",
-                        save_dir=save_path,
-                        all_fonts=ds.english.all_fonts,
-                        img_dim=(img_height,img_width),
-                        comp_dim=img_height,
-                        valid_graphemes=ds.english.number_values,
-                        num_samples=num_samples)
+    
     
     
     
@@ -103,7 +104,7 @@ if __name__=="__main__":
     parser.add_argument("--img_height",required=False,default=64,help ="height for each grapheme: default=64")
     parser.add_argument("--pad_height",required=False,default=20,help ="pad height for each grapheme for alignment correction: default=20")
     parser.add_argument("--img_width",required=False,default=512,help ="width dimension of word images: default=512")
-    parser.add_argument("--num_samples",required=False,default=10000,help ="number of samples to create when not using dictionary:default=100000")
+    parser.add_argument("--num_samples",required=False,default=20000,help ="number of samples to create when not using dictionary:default=100000")
     args = parser.parse_args()
     main(args)
     

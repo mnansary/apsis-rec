@@ -111,7 +111,7 @@ class DataSet(object):
             
             # vocab graphemes
             self.english.gvocab=[""]+self.english.number_values+self.english.letters+self.english.punctuations
-            self.english.ffvocab=self.english.number_values+self.english.letters+self.english.sel_puntcs
+            self.english.ffvocab=self.english.letters+self.english.sel_puntcs
             
         
         else:
@@ -135,7 +135,7 @@ class DataSet(object):
             
             # vocab graphemes
             self.bangla.gvocab=[""]+self.bangla.punctuations+self.bangla.number_values+self.known_graphemes
-            self.bangla.ffvocab=self.bangla.sel_puntcs+self.bangla.number_values+self.known_graphemes
+            self.bangla.ffvocab=self.bangla.sel_puntcs+self.known_graphemes
 
         self.symbols.df    =self.__getDataFrame(self.symbols.csv)
             
