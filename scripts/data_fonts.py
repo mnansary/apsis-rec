@@ -19,7 +19,7 @@ from ast import literal_eval
 
 from coreLib.utils import LOG_INFO
 from coreLib.dataset import DataSet
-from coreLib.synthetic import createFontFacedWords,createWords
+from coreLib.synthetic import createFontFacedWords
 tqdm.pandas()
 #--------------------
 # main
@@ -34,25 +34,9 @@ def main(args):
     dict_max_len=   int(args.dict_max_len)
     pad_height  =   int(args.pad_height)
     # dataset object
-    ds=DataSet(data_dir=data_path,check_english=True)
-    # create img_path in df
-    ds.english.graphemes.df["img_path"]=ds.english.graphemes.df.filename.progress_apply(lambda x:os.path.join(ds.english.graphemes.dir,f"{x}.bmp"))
-    ds.symbols.df["img_path"]=ds.symbols.df.filename.progress_apply(lambda x:os.path.join(ds.symbols.dir,f"{x}.bmp"))
-    df=pd.concat([ds.english.graphemes.df,ds.symbols.df])
-    LOG_INFO("Creating english words data")
-    createWords(iden="en.words",
-                df=df,
-                save_dir=save_path,
-                img_dim=(img_height,img_width),
-                comp_dim=img_height,
-                pad_height=pad_height,
-                top_exts=[],
-                bot_exts=[],
-                dictionary=ds.english.dictionary,
-                num_samples=num_samples)
-    
+    ds=DataSet(data_dir=data_path,check_english=True)    
     LOG_INFO("Creating english fontfaced data")
-    createFontFacedWords(iden="font.en.words",
+    createFontFacedWords(iden="f.en",
                         save_dir=save_path,
                         all_fonts=ds.english.all_fonts,
                         img_dim=(img_height,img_width),
@@ -65,7 +49,7 @@ def main(args):
     
     ds=DataSet(data_dir=data_path,check_english=False)
     LOG_INFO("Creating bangla fontfaced data")
-    createFontFacedWords(iden="font.bn.words",
+    createFontFacedWords(iden="f.bn",
                         save_dir=save_path,
                         all_fonts=ds.bangla.all_fonts,
                         img_dim=(img_height,img_width),

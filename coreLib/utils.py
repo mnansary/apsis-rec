@@ -176,7 +176,8 @@ def get_encoded_label(symbol_list,vocab):
     '''
     encoded=[]
     for symbol in symbol_list:
-        encoded.append(vocab.index(symbol))
+        if symbol!=' ':
+            encoded.append(vocab.index(symbol))
     return encoded
 #---------------------------------------------------------------
 def pad_encoded_label(label,max_len,pad_value):
@@ -774,20 +775,20 @@ def boxnoise(img,use_random_lines=False):
     lwidth=random.randint(2,5)
     # draw up down
     if random.choice([1,0])==1:
-        cv2.rectangle(img,(x_min,y_min),(x_min,y_max),(0,0,0),lwidth)
+        cv2.rectangle(img,(x_min,y_min),(x_min,y_max),(255,255,255),lwidth)
     if random.choice([1,0])==1:
-        cv2.rectangle(img,(x_max,y_min),(x_max,y_max),(0,0,0),lwidth)
+        cv2.rectangle(img,(x_max,y_min),(x_max,y_max),(255,255,255),lwidth)
     # draw left right
     if random.choice([1,0])==1:
-        cv2.rectangle(img,(x_min,y_min),(x_max,y_min),(0,0,0),lwidth)
+        cv2.rectangle(img,(x_min,y_min),(x_max,y_min),(255,255,255),lwidth)
     if random.choice([1,0])==1:
-        cv2.rectangle(img,(x_min,y_max),(x_max,y_max),(0,0,0),lwidth)
+        cv2.rectangle(img,(x_min,y_max),(x_max,y_max),(255,255,255),lwidth)
 
     if use_random_lines:
         if random.choice([0,1])==1:
             x_min=random.randint(0,(x_max-x_min)//2)
-            cv2.rectangle(img,(x_min,y_min),(x_min,y_max),(0,0,0),lwidth)
+            cv2.rectangle(img,(x_min,y_min),(x_min,y_max),(255,255,255),lwidth)
         else:
             y_min=random.randint(0,(y_max-y_min)//2)
-            cv2.rectangle(img,(x_min,y_min),(x_max,y_min),(0,0,0),lwidth)
+            cv2.rectangle(img,(x_min,y_min),(x_max,y_min),(255,255,255),lwidth)
     return img 

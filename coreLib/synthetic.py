@@ -11,7 +11,7 @@ import numpy as np
 import random
 import pandas as pd 
 from tqdm import tqdm
-from .utils import LOG_INFO, correctPadding,create_dir,noisy,boxnoise
+from .utils import LOG_INFO, correctPadding,create_dir,boxnoise
 import PIL
 import PIL.Image , PIL.ImageDraw , PIL.ImageFont 
 tqdm.pandas()
@@ -197,7 +197,7 @@ def saveDictionary(dictionary,
             # add noise
             #-----------------------------
             img=cv2.merge((img,img,img))
-            img=noisy(img)
+            #img=noisy(img)
             img=boxnoise(img,use_random_lines=True)
             img=np.squeeze(img[:,:,0])
             # correct padding
@@ -254,13 +254,6 @@ def saveFontFacedDictionary(dictionary,
             _width= int(comp_dim* _w/_h) 
             img=cv2.resize(img,(_width,comp_dim),fx=0,fy=0, interpolation = cv2.INTER_NEAREST)
             
-            #-----------------------------
-            # add noise
-            #-----------------------------
-            img=cv2.merge((img,img,img))
-            img=noisy(img)
-            img=boxnoise(img)
-            img=np.squeeze(img[:,:,0])
             # correct padding
             img,imask=correctPadding(img,img_dim,ptype="left")
             # save
