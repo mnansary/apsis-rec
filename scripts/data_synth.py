@@ -17,7 +17,7 @@ from tqdm import tqdm
 
 from coreLib.utils import LOG_INFO
 from coreLib.dataset import DataSet
-from coreLib.synthetic import createWords
+from coreLib.synthetic import createWords,createFontFacedWords
 tqdm.pandas()
 #--------------------
 # main
@@ -32,48 +32,36 @@ def main(args):
     num_samples =   int(args.num_samples)
     # dataset object
     ds=DataSet(data_dir=data_path)
-    LOG_INFO("Creating bangla numbers data")
+    LOG_INFO("Creating Mixed data")
     # create img_path in df
     ds.bangla.numbers.df["img_path"]=ds.bangla.numbers.df.filename.progress_apply(lambda x:os.path.join(ds.bangla.numbers.dir,f"{x}.bmp"))
-    ds.symbols.df["img_path"]=ds.symbols.df.filename.progress_apply(lambda x:os.path.join(ds.symbols.dir,f"{x}.bmp"))
-    df=pd.concat([ds.bangla.numbers.df,ds.symbols.df])
-    LOG_INFO("Creating synthetic bangla numbers data")
-    createWords(iden="n.bn",
-                df=df,
-                save_dir=save_path,
-                img_dim=(img_height,img_width),
-                comp_dim=img_height,
-                pad_height=pad_height,
-                top_exts=[],
-                bot_exts=[],
-                dictionary=None,
-                valid_graphemes=ds.bangla.number_values,
-                num_samples=num_samples,
-                numbers_only=True)            
-    
-    # dataset object
-    ds=DataSet(data_dir=data_path,check_english=True)
-    LOG_INFO("Creating english numbers data")
-    # create img_path in df
     ds.english.numbers.df["img_path"]=ds.english.numbers.df.filename.progress_apply(lambda x:os.path.join(ds.english.numbers.dir,f"{x}.bmp"))
+    ds.bangla.graphemes.df["img_path"]=ds.bangla.graphemes.df.filename.progress_apply(lambda x:os.path.join(ds.bangla.graphemes.dir,f"{x}.bmp"))
+    ds.english.graphemes.df["img_path"]=ds.english.graphemes.df.filename.progress_apply(lambda x:os.path.join(ds.english.graphemes.dir,f"{x}.bmp"))
     ds.symbols.df["img_path"]=ds.symbols.df.filename.progress_apply(lambda x:os.path.join(ds.symbols.dir,f"{x}.bmp"))
-    df=pd.concat([ds.english.numbers.df,ds.symbols.df])
-    LOG_INFO("Creating synthetic english numbers data")
-    createWords(iden="n.en",
+    
+    df=pd.concat([ds.bangla.numbers.df,
+                  ds.english.numbers.df,
+                  ds.bangla.graphemes.df,
+                  ds.english.graphemes.df,  
+                  ds.symbols.df],ignore_index=True)
+
+    LOG_INFO("Creating synthetic data")
+    
+    mixed_vocab=list(set(ds.bangla.ffvocab+ds.english.ffvocab))
+    
+    createWords(iden="synth",
                 df=df,
                 save_dir=save_path,
                 img_dim=(img_height,img_width),
                 comp_dim=img_height,
                 pad_height=pad_height,
-                top_exts=[],
-                bot_exts=[],
+                top_exts=ds.bangla.top_exts,
+                bot_exts=ds.bangla.bot_exts,
                 dictionary=None,
-                valid_graphemes=ds.english.number_values,
+                valid_graphemes=mixed_vocab,
                 num_samples=num_samples,
                 numbers_only=True)            
-    
-    
-    
     
 #-----------------------------------------------------------------------------------
 

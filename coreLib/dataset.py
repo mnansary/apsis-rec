@@ -17,12 +17,12 @@ tqdm.pandas()
 # class info
 #--------------------
 class DataSet(object):
-    def __init__(self,data_dir,check_english=False):
+    def __init__(self,data_dir):
         '''
             data_dir : the location of the data folder
         '''
         self.data_dir       =   data_dir
-        self.check_english  =   check_english
+        
 
         class bangla:
             vowels                 =   ['অ', 'আ', 'ই', 'ঈ', 'উ', 'ঊ', 'ঋ', 'এ', 'ঐ', 'ও', 'ঔ']
@@ -99,43 +99,42 @@ class DataSet(object):
         # error check
         self.__checkExistance()
         
-        if self.check_english:
-                # get df
-            self.english.graphemes.df    =self.__getDataFrame(self.english.graphemes.csv)
-            self.english.numbers.df      =self.__getDataFrame(self.english.numbers.csv)
-            self.english.dictionary      =self.__getDataFrame(self.english.dictionary_csv,is_dict=True)
-            
-            # data validity
-            self.__checkDataValidity(self.english.graphemes,"english.graphemes")
-            self.__checkDataValidity(self.english.numbers,"english.numbers")
-            
-            # vocab graphemes
-            self.english.gvocab=[""]+self.english.number_values+self.english.letters+self.english.punctuations
-            self.english.ffvocab=self.english.letters+self.english.sel_puntcs+self.english.number_values+[' ']
-            
+        # get df
+        self.english.graphemes.df    =self.__getDataFrame(self.english.graphemes.csv)
+        self.english.numbers.df      =self.__getDataFrame(self.english.numbers.csv)
+        self.english.dictionary      =self.__getDataFrame(self.english.dictionary_csv,is_dict=True)
         
-        else:
-            # get df
-            self.bangla.graphemes.df    =self.__getDataFrame(self.bangla.graphemes.csv)
-            self.bangla.numbers.df      =self.__getDataFrame(self.bangla.numbers.csv)
-            self.bangla.dictionary      =self.__getDataFrame(self.bangla.dictionary_csv,is_dict=True)
-            
+        # data validity
+        self.__checkDataValidity(self.english.graphemes,"english.graphemes")
+        self.__checkDataValidity(self.english.numbers,"english.numbers")
+        
+        # vocab graphemes
+        self.english.gvocab=[""]+self.english.number_values+self.english.letters+self.english.punctuations
+        self.english.ffvocab=self.english.letters+self.english.sel_puntcs+self.english.number_values+[' ']
+        
+        
+    
+        # get df
+        self.bangla.graphemes.df    =self.__getDataFrame(self.bangla.graphemes.csv)
+        self.bangla.numbers.df      =self.__getDataFrame(self.bangla.numbers.csv)
+        self.bangla.dictionary      =self.__getDataFrame(self.bangla.dictionary_csv,is_dict=True)
+        
 
-            # graphemes
-            self.known_graphemes=sorted(list(self.bangla.graphemes.df.label.unique()))
-            # cleanup
-            self.bangla.dictionary.graphemes    =   self.bangla.dictionary.graphemes.progress_apply(lambda x: x if set(x)<=set(self.known_graphemes) else None)
-            self.bangla.dictionary.dropna(inplace=True)
-            
-            
-            
-            # data validity
-            self.__checkDataValidity(self.bangla.graphemes,"bangla.graphemes")
-            self.__checkDataValidity(self.bangla.numbers,"bangla.numbers")
-            
-            # vocab graphemes
-            self.bangla.gvocab=[""]+self.bangla.punctuations+self.bangla.number_values+self.known_graphemes
-            self.bangla.ffvocab=self.bangla.sel_puntcs+self.known_graphemes+self.bangla.number_values+[' ']
+        # graphemes
+        self.known_graphemes=sorted(list(self.bangla.graphemes.df.label.unique()))
+        # cleanup
+        self.bangla.dictionary.graphemes    =   self.bangla.dictionary.graphemes.progress_apply(lambda x: x if set(x)<=set(self.known_graphemes) else None)
+        self.bangla.dictionary.dropna(inplace=True)
+        
+        
+        
+        # data validity
+        self.__checkDataValidity(self.bangla.graphemes,"bangla.graphemes")
+        self.__checkDataValidity(self.bangla.numbers,"bangla.numbers")
+        
+        # vocab graphemes
+        self.bangla.gvocab=[""]+self.bangla.punctuations+self.bangla.number_values+self.known_graphemes
+        self.bangla.ffvocab=self.bangla.sel_puntcs+self.known_graphemes+self.bangla.number_values+[' ']
 
         self.symbols.df    =self.__getDataFrame(self.symbols.csv)
             
@@ -148,20 +147,18 @@ class DataSet(object):
             check for paths and make sure the data is there 
         '''
 
-        if self.check_english:
-            assert os.path.exists(self.english.graphemes.dir),"english graphemes dir not found"
-            assert os.path.exists(self.english.graphemes.csv),"english graphemes csv not found"
-            assert os.path.exists(self.english.numbers.dir),"english numbers dir not found"
-            assert os.path.exists(self.english.numbers.csv),"english numbers csv not found"
-            assert os.path.exists(self.english.dictionary_csv),"english dictionary csv not found"
-            assert os.path.exists(self.english.font),"english.ttf font not found"
-        else:
-            assert os.path.exists(self.bangla.graphemes.dir),"Bangla graphemes dir not found"
-            assert os.path.exists(self.bangla.graphemes.csv),"Bangla graphemes csv not found"
-            assert os.path.exists(self.bangla.numbers.dir),"Bangla numbers dir not found"
-            assert os.path.exists(self.bangla.numbers.csv),"Bangla numbers csv not found"
-            assert os.path.exists(self.bangla.dictionary_csv),"Bangla dictionary csv not found"
-            assert os.path.exists(self.bangla.font),"Bangla.ttf font not found"
+        assert os.path.exists(self.english.graphemes.dir),"english graphemes dir not found"
+        assert os.path.exists(self.english.graphemes.csv),"english graphemes csv not found"
+        assert os.path.exists(self.english.numbers.dir),"english numbers dir not found"
+        assert os.path.exists(self.english.numbers.csv),"english numbers csv not found"
+        assert os.path.exists(self.english.dictionary_csv),"english dictionary csv not found"
+        assert os.path.exists(self.english.font),"english.ttf font not found"
+        assert os.path.exists(self.bangla.graphemes.dir),"Bangla graphemes dir not found"
+        assert os.path.exists(self.bangla.graphemes.csv),"Bangla graphemes csv not found"
+        assert os.path.exists(self.bangla.numbers.dir),"Bangla numbers dir not found"
+        assert os.path.exists(self.bangla.numbers.csv),"Bangla numbers csv not found"
+        assert os.path.exists(self.bangla.dictionary_csv),"Bangla dictionary csv not found"
+        assert os.path.exists(self.bangla.font),"Bangla.ttf font not found"
         assert os.path.exists(self.symbols.dir),"Bangla graphemes dir not found"
         assert os.path.exists(self.symbols.csv),"Bangla graphemes csv not found"
             

@@ -35,7 +35,7 @@ def createImgFromComps(df,comps,pad,numbers_only=False):
             non-pad-corrected raw binary image
     '''
     if numbers_only:
-        if random.choice([1,0])==1:
+        if random.choice([1,0,0,0,0])==1:
             comps+=["/","="]
     # get img_paths
     img_paths=[]
