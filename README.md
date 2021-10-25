@@ -4,9 +4,7 @@
 ```python
 Version: 0.1.2     
 ```
-### **Related resources**:
 
-For a collection of related resources in Hand written OCR research [click here](https://docs.google.com/spreadsheets/d/1LcEsd3z6lv4MO-ynbAawEjJ27jvPUoFiU9adQkD9g1A/edit?usp=sharing) 
 
 
 **LOCAL ENVIRONMENT**  
@@ -31,8 +29,7 @@ OR use conda-
 
 
 # Resources:
-* **Bangla.ttf**        : Font to create synthetic font-faced data
-* **vocab.json**        : holder for unicode and grapheme level vocabulary data
+* **vocab.json**        : holder for unicode level vocabulary data
 * **scripts(folder)**   : fixed-execution (the execution is for certain purposes) **.py** files
 * **tools(folder)**     : **.py** files created with generalized / variable execution purposes
 * **datasets(folder)**  : **.ipynb** files with specific instructions for specific natrual datasets
@@ -67,6 +64,9 @@ The series of execution is as follows
 **se execution.md for notes and specific instructions** 
 
 
-
+# TODO
+- [ ] unicode based fixed vocabulary
+- [ ] scripts conversion
+- [ ] scene and HTR dataset
 
 

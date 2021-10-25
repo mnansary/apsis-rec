@@ -273,9 +273,9 @@ class GraphemeParser(object):
 class WordCleaner(object):
     def __init__(self):
         # components    
-        '''
-            this division of vowel, consonant and modifier is done according to :https://bn.wikipedia.org/wiki/%E0%A7%8E 
-        '''
+        
+        #this division of vowel, consonant and modifier is done according to :https://bn.wikipedia.org/wiki/%E0%A7%8E 
+        
         self.vowels                 =   ['অ', 'আ', 'ই', 'ঈ', 'উ', 'ঊ', 'ঋ', 'এ', 'ঐ', 'ও', 'ঔ']
         self.consonants             =   ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 
                                          'চ', 'ছ','জ', 'ঝ', 'ঞ', 
