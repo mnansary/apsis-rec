@@ -2,9 +2,8 @@
 # synthetic words
 
 ```python
-Version: 0.1.2     
+Version: 0.0.5     
 ```
-
 
 
 **LOCAL ENVIRONMENT**  
@@ -26,47 +25,4 @@ Gnome       : 3.28.2
 > Its better to use a virtual environment 
 OR use conda-
 * **conda**: use environment.yml: ```conda env create -f environment.yml```
-
-
-# Resources:
-* **vocab.json**        : holder for unicode level vocabulary data
-* **scripts(folder)**   : fixed-execution (the execution is for certain purposes) **.py** files
-* **tools(folder)**     : **.py** files created with generalized / variable execution purposes
-* **datasets(folder)**  : **.ipynb** files with specific instructions for specific natrual datasets
-* **datasets.md**       : sources and processing instuctions for used datasets  
-* **execution.md**      : execution notes for all scripts and tools
-* **coreLib(folder)**   : a custom module for cleaner work flow
-
-
-# Re-production
-
-The series of execution is as follows
-
-1. **scripts/data_banglaSynth.py**
-2. **datasets/boise_state.ipynb**
-3. **datasets/bn_htr.ipynb**
-4. **datasets/bangla_writing.ipynb**
-5. **tools/process.py** x 3 : execute for all 3 natrual written datasets(bw,bs,bh)
-6. **scripts/extend_vocab.py**
-7. **tools/record.py**  x 8 : to create tfrecords for the following datasets
-
-```
-    bangla.graphemes
-    bangla.numbers
-    bw/train
-    bw/test
-    bs/train
-    bs/test
-    bh/train
-    bh/test
-    
-```
-**se execution.md for notes and specific instructions** 
-
-
-# TODO
-- [ ] unicode based fixed vocabulary
-- [ ] scripts conversion
-- [ ] scene and HTR dataset
-
 
