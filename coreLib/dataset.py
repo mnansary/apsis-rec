@@ -22,6 +22,7 @@ class DataSet(object):
             data_dir : the location of the data folder
         '''
         self.data_dir       =   data_dir
+        self.backs          =   [img_path for img_path in tqdm(glob(os.path.join(data_dir,"common","background","*.*")))]
         self.language       =   language    
         if not use_printed_only:
             # resources

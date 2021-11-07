@@ -169,7 +169,8 @@ def createSyntheticData(iden,
                         use_only_numbers=False,
                         use_all=True,
                         fname_offset=0,
-                        return_df=False):
+                        return_df=False,
+                        create_scene_data=True):
     '''
         creates: 
             * handwriten word image
@@ -234,8 +235,17 @@ def createSyntheticData(iden,
         try:
             comps=dictionary.iloc[idx,1]
             if data_type=="printed":
-                font=PIL.ImageFont.truetype(random.choice(ds.fonts),comp_dim)
-                img=createFontImageFromComps(font,comps)    
+                font=PIL.ImageFont.truetype(random.choice(ds.fonts),random.randint(10,comp_dim))
+                img=createFontImageFromComps(font,comps) 
+                if create_scene_data:
+                    back=cv2.imread(random.choice(ds.backs))
+                    hb,wb,_=back.shape
+                    hi,wi=img.shape
+                    x=random.randint(0,wb-wi)
+                    y=random.randint(0,hb-hi)
+                    back=back[y:y+hi,x:x+wi]
+                    back[img<255]=randColor()
+                    img=np.copy(back)   
             else:
                 # image
                 img=createImgFromComps(df=ds.df,comps=comps,pad=pad)
