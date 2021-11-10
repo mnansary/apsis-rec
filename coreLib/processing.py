@@ -161,7 +161,7 @@ def processImages(df,img_dim,ptype="left",factor=32):
     return df
 
 #---------------------------------------------------------------
-def processLabels(df,vocab,max_len):
+def processLabels(df,vocab,max_len,decomp=1):
     '''
         processLabels:
         * divides: word to - unicodes,components
@@ -171,10 +171,13 @@ def processLabels(df,vocab,max_len):
         g-->grapheme components
         r-->raw with out start end
     '''
-    GP=GraphemeParser(language=None)
-    # process text
-    ## components
-    df["components"]=df.word.progress_apply(lambda x:GP.process(x))
+    if decomp==1:
+        GP=GraphemeParser(language=None)
+        # process text
+        ## components
+        df["components"]=df.word.progress_apply(lambda x:GP.process(x))
+    else:
+        df["components"]=df.word.progress_apply(lambda x:[i for i in str(x)])
     df.dropna(inplace=True)
     df["eg_label"]=df.components.progress_apply(lambda x:encode_label(x,vocab))
     ### grapheme
@@ -184,7 +187,7 @@ def processLabels(df,vocab,max_len):
     return df 
 
 #------------------------------------------------
-def processData(csv,vocab,max_len,img_dim):
+def processData(csv,vocab,max_len,img_dim,decomp=1):
     '''
         processes the dataset
         args:
@@ -198,7 +201,7 @@ def processData(csv,vocab,max_len,img_dim):
     # images
     df=processImages(df,img_dim)
     # labels
-    df=processLabels(df,vocab,max_len)
+    df=processLabels(df,vocab,max_len,decomp)
     # save data
     cols=["filepath","mask","label"]
     df=df[cols]

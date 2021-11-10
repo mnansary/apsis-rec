@@ -43,6 +43,7 @@ def main(args):
     dict_min_len=   int(args.dict_min_len)
     iden        =   args.iden
     seq_max_len =   int(args.seq_max_len)
+    decomp      =   int(args.decomp)
     
     if iden is None:
         iden=f"{language}_{data_type}"
@@ -59,7 +60,7 @@ def main(args):
                             dict_max_len=dict_max_len,
                             dict_min_len=dict_min_len)
     # processing
-    df=processData(csv,vocab,seq_max_len,img_dim)
+    df=processData(csv,vocab,seq_max_len,img_dim,decomp)
     # storing
     save_path=os.path.dirname(csv)
     save_path=create_dir(save_path,iden)
@@ -84,5 +85,6 @@ if __name__=="__main__":
     parser.add_argument("--dict_max_len",required=False,default=10,help=" the maximum length of data for randomized dictionary")
     parser.add_argument("--dict_min_len",required=False,default=1,help=" the minimum length of data for randomized dictionary")
     parser.add_argument("--seq_max_len",required=False,default=80,help=" the maximum length of data for modeling")
+    parser.add_argument("--decomp",required=False,default=1,help=" use grapheme decomposition")
     args = parser.parse_args()
     main(args)
