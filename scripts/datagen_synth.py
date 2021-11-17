@@ -84,7 +84,7 @@ if __name__=="__main__":
     parser.add_argument("--num_samples",required=False,default=100000,help ="number of samples to create when:default=100000")
     parser.add_argument("--dict_max_len",required=False,default=10,help=" the maximum length of data for randomized dictionary")
     parser.add_argument("--dict_min_len",required=False,default=1,help=" the minimum length of data for randomized dictionary")
-    parser.add_argument("--seq_max_len",required=False,default=80,help=" the maximum length of data for modeling")
+    parser.add_argument("--seq_max_len",required=False,default=100,help=" the maximum length of data for modeling")
     parser.add_argument("--decomp",required=False,default=1,help=" use grapheme decomposition")
     args = parser.parse_args()
     main(args)

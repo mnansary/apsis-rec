@@ -235,7 +235,7 @@ def createSyntheticData(iden,
         try:
             comps=dictionary.iloc[idx,1]
             if data_type=="printed":
-                font=PIL.ImageFont.truetype(random.choice(ds.fonts),random.randint(10,comp_dim))
+                font=PIL.ImageFont.truetype(random.choice(ds.fonts),random.randint(8,256))
                 img=createFontImageFromComps(font,comps) 
                 if create_scene_data:
                     back=cv2.imread(random.choice(ds.backs))

@@ -175,6 +175,7 @@ def processLabels(df,vocab,max_len,decomp=1):
         GP=GraphemeParser(language=None)
         # process text
         ## components
+        df.word=df.word.progress_apply(lambda x:str(x))
         df["components"]=df.word.progress_apply(lambda x:GP.process(x))
     else:
         df["components"]=df.word.progress_apply(lambda x:[i for i in str(x)])
