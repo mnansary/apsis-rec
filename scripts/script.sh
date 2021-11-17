@@ -39,6 +39,7 @@ en_hr_ds="${ds_path}en_hw/"
 
 #-----------------------------------synthetic------------------------------------------
 python datagen_synth.py $src_dir "bangla" "printed" $ds_path --num_samples 10000000
+
 #python datagen_synth.py $src_dir "bangla" "handwritten" $ds_path --num_samples 100000
 #-----------------------------------synthetic------------------------------------------
 #-----------------------------------bangla-----------------------------------------------

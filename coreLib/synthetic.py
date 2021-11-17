@@ -127,7 +127,7 @@ def createFontImageFromComps(font,comps):
     img=255-img
     return img    
     
-def createRandomDictionary(valid_graphemes,dict_max_len,dict_min_len,num_samples):
+def createRandomDictionary(valid_graphemes,num_samples):
     '''
         creates a randomized dictionary
         args:
@@ -141,7 +141,7 @@ def createRandomDictionary(valid_graphemes,dict_max_len,dict_min_len,num_samples
     word=[]
     graphemes=[]
     for _ in tqdm(range(num_samples)):
-        len_word=random.randint(dict_min_len,dict_max_len)
+        len_word=random.choices(population=[1,2,3,4,5,6,7,8,9,10],weights=[0.05,0.05,0.1,0.15,0.15,0.15,0.15,0.1,0.05,0.05],k=1)[0]
         _graphemes=[]
         for _ in range(len_word):
             _graphemes.append(random.choice(valid_graphemes))
@@ -161,8 +161,6 @@ def createSyntheticData(iden,
                         data_dir,
                         language,
                         num_samples=100000,
-                        dict_max_len=10,
-                        dict_min_len=1,
                         comp_dim=64,
                         pad_height=20,
                         use_only_graphemes=False,
@@ -184,8 +182,7 @@ def createSyntheticData(iden,
             data_dir        :       the directory that holds graphemes and numbers and fonts data
             language        :       the specific language to use
             num_samples     :       number of data to be created 
-            dict_max_len    :       the maximum length of data for randomized dictionary
-            dict_min_len    :       the minimum length of data for randomized dictionary                    
+            
     '''
     #---------------
     # processing
@@ -225,7 +222,7 @@ def createSyntheticData(iden,
             height          =pad_height   
 
     # save data
-    dictionary=createRandomDictionary(valid_graphemes,dict_max_len,dict_min_len,num_samples)
+    dictionary=createRandomDictionary(valid_graphemes,num_samples)
     # dataframe vars
     filepaths=[]
     words=[]
@@ -235,10 +232,12 @@ def createSyntheticData(iden,
         try:
             comps=dictionary.iloc[idx,1]
             if data_type=="printed":
-                font=PIL.ImageFont.truetype(random.choice(ds.fonts),random.randint(8,256))
+                fsize=random.randint(8,256)
+                font=PIL.ImageFont.truetype(random.choice(ds.fonts),fsize)
                 img=createFontImageFromComps(font,comps) 
                 if create_scene_data:
                     back=cv2.imread(random.choice(ds.backs))
+                    back=cv2.resize(back,(int(20*fsize),int(20*fsize)))
                     hb,wb,_=back.shape
                     hi,wi=img.shape
                     x=random.randint(0,wb-wi)
