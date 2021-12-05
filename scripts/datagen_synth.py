@@ -78,7 +78,7 @@ if __name__=="__main__":
     parser.add_argument("--img_width",required=False,default=512,help ="width for each grapheme: default=512")
     parser.add_argument("--pad_height",required=False,default=20,help ="pad height for each grapheme for alignment correction: default=20")
     parser.add_argument("--num_samples",required=False,default=100000,help ="number of samples to create when:default=100000")
-    parser.add_argument("--seq_max_len",required=False,default=100,help=" the maximum length of data for modeling")
+    parser.add_argument("--seq_max_len",required=False,default=80,help=" the maximum length of data for modeling")
     parser.add_argument("--decomp",required=False,default=1,help=" use grapheme decomposition")
     args = parser.parse_args()
     main(args)

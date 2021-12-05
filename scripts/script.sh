@@ -40,12 +40,13 @@ python datagen.py $iit_bn_ds
 
 #-----------------------------------synthetic------------------------------------------
 #python datagen_synth.py $src_dir "bangla" "printed" $ds_path --num_samples 10000000
-#python datagen_synth.py $src_dir "bangla" "handwritten" $ds_path --num_samples 100000
+python datagen_synth.py $src_dir "bangla" "handwritten" $ds_path --num_samples 500000
 #-----------------------------------synthetic------------------------------------------
 #-----------------------------------bangla-----------------------------------------------
 
 #-----------------------------------english-----------------------------------------------
 python datasets/eng_hw.py $eng_hw_path $ds_path
+python datagen.py $en_hr_ds
 #python datagen_synth.py $src_dir "english" "printed" $ds_path --num_samples 10000000 --decomp 0
 #-----------------------------------english-----------------------------------------------
 

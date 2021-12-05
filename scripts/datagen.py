@@ -55,6 +55,6 @@ if __name__=="__main__":
     parser.add_argument("--iden",required=False,default=None,help="identifier to identify the dataset")
     parser.add_argument("--img_height",required=False,default=64,help ="height for each grapheme: default=64")
     parser.add_argument("--img_width",required=False,default=512,help ="width for each grapheme: default=512")
-    parser.add_argument("--seq_max_len",required=False,default=100,help=" the maximum length of data for modeling")
+    parser.add_argument("--seq_max_len",required=False,default=80,help=" the maximum length of data for modeling")
     args = parser.parse_args()
     main(args)
