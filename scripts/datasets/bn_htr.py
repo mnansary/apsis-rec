@@ -22,26 +22,29 @@ def get_labels(data_path):
     '''
     dfs=[]
     for i in tqdm(range(1,151)):
-        if i==60:# Exception
-            xlsx=os.path.join(data_path,f"{i}",f"{i}.xl.xlsx")
-        else:
-            xlsx=os.path.join(data_path,f"{i}",f"{i}.xlsx")
-        df=pd.read_excel(xlsx)
-        if len(df.columns)==0:
-            df=pd.read_excel(xlsx,sheet_name='Sheet1')
-        
-        if "Id" in df.columns:
-            filename=df["Id"].tolist()
-        else:
-            filename=df["ID"].tolist()
+        try:
+            if i==60:# Exception
+                xlsx=os.path.join(data_path,f"{i}",f"{i}.xl.xlsx")
+            else:
+                xlsx=os.path.join(data_path,f"{i}",f"{i}.xlsx")
+            df=pd.read_excel(xlsx)
+            if len(df.columns)==0:
+                df=pd.read_excel(xlsx,sheet_name='Sheet1')
+            
+            if "Id" in df.columns:
+                filename=df["Id"].tolist()
+            else:
+                filename=df["ID"].tolist()
 
-        if "Word" in df.columns:
-            labels=df["Word"].tolist()
-        else:
-            labels=df["word"].tolist()
+            if "Word" in df.columns:
+                labels=df["Word"].tolist()
+            else:
+                labels=df["word"].tolist()
 
-        df=pd.DataFrame({"source":filename,"word":labels})
-        dfs.append(df)
+            df=pd.DataFrame({"source":filename,"word":labels})
+            dfs.append(df)
+        except Exception as e:
+            LOG_INFO(xlsx)
     # valid idens
     df=pd.concat(dfs,ignore_index=True)
     idens=df["source"].tolist()
@@ -72,7 +75,7 @@ def main(args):
 
     for img_path in tqdm(valid):
         img=cv2.imread(img_path)
-        
+        img=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         # base
         base=os.path.basename(img_path).split(".")[0]
         idf=df.loc[df["source"]==base]

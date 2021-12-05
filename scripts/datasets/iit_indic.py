@@ -36,9 +36,6 @@ def process(txt,vocab,dir,save_path,idx):
             label=vocab[int(label_iden.strip())]
             img_path=os.path.join(dir,img_iden)
             img=cv2.imread(img_path,0)
-            # thresh
-            _,img = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-            img=stripPads(img,255)
             fname=f"{idx}.png"
             img_save_path=os.path.join(save_path,fname)
             # save
@@ -78,8 +75,7 @@ def main(args):
 
     if iden is None:
         iden=os.path.basename(data_path)
-        iden=f"iit.{iden}"
-
+        
 
     main_path=create_dir(save_path,f"{iden}")
     save_path=create_dir(main_path,"images")

@@ -35,7 +35,7 @@ def extract_word_images_and_labels(img_path):
     # json_path
     json_path=img_path.replace("jpg","json")
     # read image
-    data=cv2.imread(img_path,0)
+    data=cv2.imread(img_path)
     # label
     label_json = json.load(open(json_path,'r'))
     # get word idx
@@ -76,9 +76,6 @@ def main(args):
         if len(imgs)>0:
             for img,label in zip(imgs,labels):
                 try:
-                    # thresh
-                    _,img = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-                    img=stripPads(img,255)
                     img_save_path=os.path.join(save_path,f"{i}.png")
                     # save
                     cv2.imwrite(img_save_path,img)

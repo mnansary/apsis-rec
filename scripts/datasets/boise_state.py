@@ -140,11 +140,6 @@ def main(args):
         # image
         #-------------
         img=cv2.imread(img_path)
-        # charmap
-        cimg=removeShadow(img)
-        cimg=cv2.cvtColor(cimg, cv2.COLOR_BGR2GRAY)
-        blur = cv2.GaussianBlur(cimg,(5,5),0)
-        _,img = cv2.threshold(blur,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
         for line in idf.line.unique():
             linedf=idf.loc[idf.line==line]
             for word in linedf.word.unique():
@@ -157,7 +152,6 @@ def main(args):
                 ymax=int(max(wdf.ymax.tolist()))
 
                 data=img[ymin:ymax,xmin:xmax]
-                data=stripPads(data,255)
                 
                 fname=f"{iden}.png"
                 cv2.imwrite(os.path.join(save_path,fname),data)
