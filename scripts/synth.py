@@ -19,9 +19,7 @@ from ast import literal_eval
 
 from coreLib.utils import *
 from coreLib.synthetic import createSyntheticData
-from coreLib.languages import languages,vocab
-from coreLib.processing import processData
-from coreLib.store import createRecords
+from coreLib.languages import languages
 tqdm.pandas()
 #--------------------
 # main
@@ -35,18 +33,13 @@ def main(args):
     assert data_type in ["printed","handwritten"],"must be in ['printed','handwritten']"
     
     save_path   =   args.save_path
-    img_height  =   int(args.img_height)
-    img_width   =   int(args.img_width)
     pad_height  =   int(args.pad_height)
     num_samples =   int(args.num_samples)
     iden        =   args.iden
-    seq_max_len =   int(args.seq_max_len)
-    decomp      =   int(args.decomp)
     
     if iden is None:
         iden=f"{language}_{data_type}"
     language=languages[language]
-    img_dim=(img_height,img_width)
     # data creation
     csv=createSyntheticData(iden=iden,
                             save_dir=save_path,
@@ -55,13 +48,6 @@ def main(args):
                             data_type=data_type,
                             num_samples=num_samples,
                             pad_height=pad_height)
-    # processing
-    df=processData(csv,vocab,seq_max_len,img_dim,decomp)
-    # storing
-    save_path=os.path.dirname(csv)
-    save_path=create_dir(save_path,iden)
-    createRecords(df,save_path)
-
 #-----------------------------------------------------------------------------------
 
 if __name__=="__main__":
@@ -74,11 +60,7 @@ if __name__=="__main__":
     parser.add_argument("data_type", help="type of data to generate must be in ['printed','handwritten']")
     parser.add_argument("save_path", help="Path of the directory to save the dataset")
     parser.add_argument("--iden",required=False,default=None,help="identifier to identify the dataset")
-    parser.add_argument("--img_height",required=False,default=64,help ="height for each grapheme: default=64")
-    parser.add_argument("--img_width",required=False,default=512,help ="width for each grapheme: default=512")
     parser.add_argument("--pad_height",required=False,default=20,help ="pad height for each grapheme for alignment correction: default=20")
     parser.add_argument("--num_samples",required=False,default=100000,help ="number of samples to create when:default=100000")
-    parser.add_argument("--seq_max_len",required=False,default=80,help=" the maximum length of data for modeling")
-    parser.add_argument("--decomp",required=False,default=1,help=" use grapheme decomposition")
     args = parser.parse_args()
     main(args)
