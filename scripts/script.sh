@@ -25,7 +25,7 @@ bs_ds="${ds_path}bs/"
 bn_pr_ds="${ds_path}bangla_printed/"
 en_pr_ds="${ds_path}english_printed/"
 bn_hr_ds="${ds_path}bangla_handwritten/"
-iit_bn_ds="${ds_path}iit.bn/"
+iit_bn_ds="${ds_path}bn/"
 
 en_hr_ds="${ds_path}en_hw/"
 
@@ -42,10 +42,12 @@ en_hr_ds="${ds_path}en_hw/"
 #python datasets/iit_indic.py $iit_bn_ref $ds_path
 
 #-----------------------------------natrual---------------------------------------------
-python datagen.py $bw_ds 
-python datagen.py $bs_ds 
-python datagen.py $bh_ds 
+#python datagen.py $bw_ds 
+#python datagen.py $bs_ds 
+#python datagen.py $bh_ds 
 python datagen.py $iit_bn_ds 
+python datagen.py $bn_pr_ds
+python datagen.py $en_pr_ds
 #-----------------------------------natrual---------------------------------------------
 
 #-----------------------------------synthetic------------------------------------------
