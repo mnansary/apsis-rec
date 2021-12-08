@@ -30,19 +30,20 @@ def main(args):
     data_dir    =   args.data_dir
     img_height  =   int(args.img_height)
     img_width   =   int(args.img_width)
-    iden        =   args.iden
     seq_max_len =   int(args.seq_max_len)
     
-    if iden is None:
-        iden=os.path.basename(os.path.dirname(data_dir))
     img_dim=(img_height,img_width)
-    csv=os.path.join(data_dir,"data.csv")
+    # temporary save
+    temp_dir=create_dir(data_dir,"temp")
+    _=create_dir(temp_dir,"image")
+    _=create_dir(temp_dir,"mask")
+    save_dir=create_dir(temp_dir,"tfrecord")
+    
     # processing
-    df=processData(csv,vocab,seq_max_len,img_dim)
+    df=processData(data_dir,vocab,img_dim,seq_max_len)
     # storing
-    save_path=create_dir(data_dir,iden)
-    LOG_INFO(save_path)
-    createRecords(df,save_path)
+    LOG_INFO(save_dir)
+    createRecords(df,save_dir)
 
 #-----------------------------------------------------------------------------------
 
@@ -52,9 +53,10 @@ if __name__=="__main__":
     '''
     parser = argparse.ArgumentParser("Recognizer Synthetic Dataset Creating Script")
     parser.add_argument("data_dir", help="Path of the source data folder that contains langauge datasets")
-    parser.add_argument("--iden",required=False,default=None,help="identifier to identify the dataset")
     parser.add_argument("--img_height",required=False,default=64,help ="height for each grapheme: default=64")
     parser.add_argument("--img_width",required=False,default=512,help ="width for each grapheme: default=512")
-    parser.add_argument("--seq_max_len",required=False,default=80,help=" the maximum length of data for modeling")
+    parser.add_argument("--seq_max_len",required=False,default=40,help=" the maximum length of data for modeling")
+    parser.add_argument("--rec_size",required=False,default=10240,help=" the maximum length of data for storing in a tfrecord")
+    
     args = parser.parse_args()
     main(args)

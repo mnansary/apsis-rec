@@ -10,6 +10,8 @@ eng_hw_path="/home/apsisdev/ansary/DATASETS/RAW/eng_page/data/"
 
 
 base_path="/home/apsisdev/ansary/DATASETS/APSIS/Recognition/"
+#base_path="/home/ansary/WORK/Work/APSIS/datasets/Recognition/"
+
 save_path=$base_path
 src_dir="${base_path}source/"
 batch_sample=1000000
@@ -28,22 +30,22 @@ iit_bn_ds="${ds_path}iit.bn/"
 en_hr_ds="${ds_path}en_hw/"
 
 #-----------------------------------closed-----------------------------------------------
-python synth.py $src_dir "bangla" "printed" $ds_path --num_samples $batch_sample 
-python synth.py $src_dir "english" "printed" $ds_path --num_samples $batch_sample 
+#python synth.py $src_dir "bangla" "printed" $ds_path --num_samples $batch_sample 
+#python synth.py $src_dir "english" "printed" $ds_path --num_samples $batch_sample 
 #-----------------------------------closed-----------------------------------------------
 
 
 #-----------------------------------bangla-----------------------------------------------
-python datasets/bangla_writing.py $bw_ref $ds_path
-python datasets/boise_state.py $bs_ref $ds_path
-python datasets/bn_htr.py $bh_ref $ds_path
-python datasets/iit_indic.py $iit_bn_ref $ds_path
+#python datasets/bangla_writing.py $bw_ref $ds_path
+#python datasets/boise_state.py $bs_ref $ds_path
+#python datasets/bn_htr.py $bh_ref $ds_path
+#python datasets/iit_indic.py $iit_bn_ref $ds_path
 
 #-----------------------------------natrual---------------------------------------------
-#python datagen.py $bw_ds 
-#python datagen.py $bs_ds 
-#python datagen.py $bh_ds 
-#python datagen.py $iit_bn_ds 
+python datagen.py $bw_ds 
+python datagen.py $bs_ds 
+python datagen.py $bh_ds 
+python datagen.py $iit_bn_ds 
 #-----------------------------------natrual---------------------------------------------
 
 #-----------------------------------synthetic------------------------------------------

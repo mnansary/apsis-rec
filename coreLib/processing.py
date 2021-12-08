@@ -16,30 +16,24 @@ tqdm.pandas()
 # helpers
 #--------------------
 not_found=[]
-def pad_label(x,max_len,pad_value,start_end_value):
-    '''
-        lambda function to create padded label for robust scanner
-    '''
-    if len(x)>max_len-2:
-        return None
-    else:
-        if start_end_value is not None:
-            x=[start_end_value]+x+[start_end_value]
-        pad=[pad_value for _ in range(max_len-len(x))]
-        return x+pad
-        
-def encode_label(x,vocab):
+
+def encode_label(x,vocab,max_len):
     '''
         encodes a label
     '''
     global not_found
     label=[]
-    for ch in x:
-        try:
-            label.append(vocab.index(ch))
-        except Exception as e:
-            if ch not in not_found:not_found.append(ch)
-    return label
+    x=["start"]+x+["end"]
+    if len(x)>max_len:
+        return None
+    else:    
+        for ch in x:
+            try:
+                label.append(vocab.index(ch))
+            except Exception as e:
+                if ch not in not_found:not_found.append(ch)
+        pad=[vocab.index("pad") for _ in range(max_len-len(x))]
+        return label+pad
 
 def padWordImage(img,pad_loc,pad_dim,pad_type,pad_val):
     '''
@@ -131,37 +125,45 @@ def correctPadding(img,dim,ptype="central",pvalue=255):
     img=cv2.resize(img,(img_width,img_height),fx=0,fy=0, interpolation = cv2.INTER_NEAREST)
     return img,mask 
 #---------------------------------------------------------------
-def processImages(df,img_dim,ptype="left",factor=32):
+def processImages(df,save_dir,img_dim,ptype="left"):
     '''
         process a specific dataframe with filename,word,graphemes and mode
         args:
             df      :   the dataframe to process
+            save_dir:   path to save temp data
             img_dim :   tuple of (img_height,img_width)  
             ptype   :   type of padding to use
     '''
-    img_height,img_width=img_dim
-    masks=[]
+    datapaths=[]
+    img_dir=os.path.join(save_dir,"image")
+    mask_dir=os.path.join(save_dir,"mask")
+
     for idx in tqdm(range(len(df))):
         try:
+            # mask
+            mask=np.zeros(img_dim)
+            # path
             img_path    =   df.iloc[idx,0]
+            # filename
+            file_name   =   os.path.basename(img_path)
+            # read image
             img=cv2.imread(img_path)
             # correct padding
             img,imask=correctPadding(img,img_dim,ptype=ptype)
             # mask
-            imask=math.ceil((imask/img_width)*(img_width//factor))
-            mask=np.zeros((img_height//factor,img_width//factor))
-            mask[:,:imask]=1
-            mask=mask.flatten().tolist()
-            mask=[int(i) for i in mask]
-            cv2.imwrite(img_path,img)
-            masks.append(mask)
+            mask[:,imask:]=1
+            datapath=os.path.join(img_dir,file_name)
+            cv2.imwrite(datapath,img)
+            cv2.imwrite(os.path.join(mask_dir,file_name),mask)
+            datapaths.append(datapath)
+            
         except Exception as e:
+            datapaths.append(None)
             LOG_INFO(e)
-    df["mask"]=masks    
+    df["datapath"]=datapaths
     return df
-
 #---------------------------------------------------------------
-def processLabels(df,vocab,max_len,decomp=1):
+def processLabels(df,vocab,max_len):
     '''
         processLabels:
         * divides: word to - unicodes,components
@@ -171,42 +173,38 @@ def processLabels(df,vocab,max_len,decomp=1):
         g-->grapheme components
         r-->raw with out start end
     '''
-    if decomp==1:
-        GP=GraphemeParser(language=None)
-        # process text
-        ## components
-        df.word=df.word.progress_apply(lambda x:str(x))
-        df["components"]=df.word.progress_apply(lambda x:GP.process(x))
-    else:
-        df["components"]=df.word.progress_apply(lambda x:[i for i in str(x)])
+    GP=GraphemeParser(language=None)
+    # process text
+    
+    ## components
+    df.word=df.word.progress_apply(lambda x:str(x))
+    df["components"]=df.word.progress_apply(lambda x:GP.process(x))
     df.dropna(inplace=True)
     df.reset_index(drop=True,inplace=True)
-    df["eg_label"]=df.components.progress_apply(lambda x:encode_label(x,vocab))
-    ### grapheme
-    start_end_value=len(vocab)+1
-    pad_value      =len(vocab)+2
-    df["label"]=df.eg_label.progress_apply(lambda x:pad_label(x,max_len,pad_value,start_end_value))
+    df["label"]=df.components.progress_apply(lambda x:encode_label(x,vocab,max_len))
     return df 
 
 #------------------------------------------------
-def processData(csv,vocab,max_len,img_dim,decomp=1):
+def processData(data_dir,vocab,img_dim,max_len):
     '''
         processes the dataset
         args:
-            csv         :   a csv file that contains filepath,word,source data
+            data_dir    :   the directory that holds data.csv and images folder
             vocab       :   language class
-            max_len     :   model max_len
             img_dim     :   tuple of (img_height,img_width) 
-            num_folds   :   creating folds of the data
+            max_len     :   model max_len
     '''
+    csv=os.path.join(data_dir,"data.csv")
+    save_dir=os.path.join(data_dir,"temp")
+    # processing
     df=pd.read_csv(csv)
     df.reset_index(drop=True,inplace=True)
     # images
-    df=processImages(df,img_dim)
+    df=processImages(df,save_dir,img_dim)
     # labels
-    df=processLabels(df,vocab,max_len,decomp)
+    df=processLabels(df,vocab,max_len)
     # save data
-    cols=["filepath","mask","label"]
+    cols=["filepath","word","datapath","label"]
     df=df[cols]
     df.dropna(inplace=True)
     df.reset_index(drop=True,inplace=True)
