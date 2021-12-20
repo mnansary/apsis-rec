@@ -27,22 +27,15 @@ en_pr_ds="${ds_path}english_printed/"
 iit_bn_ds="${ds_path}bn/"
 en_ds="${ds_path}en/"
 iam_ds="${ds_path}iam/"
-
-#-----------------------------------closed-----------------------------------------------
-#python synth.py $src_dir "bangla" "printed" $ds_path --num_samples $batch_sample 
-#python synth.py $src_dir "english" "printed" $ds_path --num_samples $batch_sample 
-#-----------------------------------closed-----------------------------------------------
-
-
-#-----------------------------------bangla-----------------------------------------------
+enn_ds="${ds_path}enn/"
+bnn_ds="${ds_path}bnn/"
+#-----------------------------------natrual---------------------------------------------
 #python datasets/bangla_writing.py $bw_ref $ds_path
 #python datasets/boise_state.py $bs_ref $ds_path
 #python datasets/bn_htr.py $bh_ref $ds_path
 #python datasets/iit_indic.py $iit_bn_ref $ds_path
 #python datasets/eng_hw.py $eng_hw_path $ds_path
 #python datasets/iam_eng.py $iam_path $ds_path
-
-#-----------------------------------natrual---------------------------------------------
 #python datagen.py $bw_ds 
 #python datagen.py $bs_ds 
 #python datagen.py $bh_ds 
@@ -54,8 +47,10 @@ iam_ds="${ds_path}iam/"
 #-----------------------------------natrual---------------------------------------------
 
 #-----------------------------------synthetic------------------------------------------
-python nums.py $src_dir "bangla" "handwritten" $ds_path --num_samples 20000
-python nums.py $src_dir "english" "handwritten" $ds_path --num_samples 20000
+python nums.py $src_dir "bangla" "handwritten" $ds_path --num_samples 20 --iden "bnn"
+python nums.py $src_dir "english" "handwritten" $ds_path --num_samples 20 --iden "enn"
+python datagen.py $enn_ds
+python datagen.py $bnn_ds
 #-----------------------------------synthetic------------------------------------------
 
 
