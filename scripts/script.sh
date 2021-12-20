@@ -40,7 +40,7 @@ iam_ds="${ds_path}iam/"
 #python datasets/bn_htr.py $bh_ref $ds_path
 #python datasets/iit_indic.py $iit_bn_ref $ds_path
 #python datasets/eng_hw.py $eng_hw_path $ds_path
-python datasets/iam_eng.py $iam_path $ds_path
+#python datasets/iam_eng.py $iam_path $ds_path
 
 #-----------------------------------natrual---------------------------------------------
 #python datagen.py $bw_ds 
@@ -50,6 +50,7 @@ python datasets/iam_eng.py $iam_path $ds_path
 #python datagen.py $bn_pr_ds
 #python datagen.py $en_pr_ds
 #python datagen.py $en_ds
+python datagen.py $iam_ds
 #-----------------------------------natrual---------------------------------------------
 
 #-----------------------------------synthetic------------------------------------------

@@ -8,7 +8,7 @@
 import sys
 sys.path.append('../')
 
-from coreLib.utils import create_dir
+from coreLib.utils import LOG_INFO, create_dir
 import argparse
 import glob
 import os
@@ -43,30 +43,34 @@ def main(args):
         tree = ET.parse(xml_path)
         root = tree.getroot()
         for line in root.findall('./handwritten-part/line'):
-            for word in line.findall('word'):
-                text=unescape(word.attrib['text'])
-                # component-wise
-                w_minX=99999999
-                w_maxX=-1
-                w_minY=99999999
-                w_maxY=-1
-                for cmp in word.findall('cmp'):
-                    x = int(cmp.attrib['x'])
-                    y = int(cmp.attrib['y'])
-                    w = int(cmp.attrib['width'])
-                    h = int(cmp.attrib['height'])
-                    # update
-                    w_maxX = max(w_maxX,x+w)
-                    w_minX = min(w_minX,x)
-                    w_maxY = max(w_maxY,y+h)
-                    w_minY = min(w_minY,y)
-                wimg=img[w_minY:w_maxY+1,w_minX:w_maxX+1]
-                img_save_path=os.path.join(img_dir,f"{fname}.png")
-                cv2.imwrite(img_save_path,wimg)
-                filepaths.append(img_save_path)
-                words.append(text)
-                fname+=1
-    
+            try:
+                for word in line.findall('word'):
+                    text=unescape(word.attrib['text'])
+                    # component-wise
+                    w_minX=99999999
+                    w_maxX=-1
+                    w_minY=99999999
+                    w_maxY=-1
+                    for cmp in word.findall('cmp'):
+                        x = int(cmp.attrib['x'])
+                        y = int(cmp.attrib['y'])
+                        w = int(cmp.attrib['width'])
+                        h = int(cmp.attrib['height'])
+                        # update
+                        w_maxX = max(w_maxX,x+w)
+                        w_minX = min(w_minX,x)
+                        w_maxY = max(w_maxY,y+h)
+                        w_minY = min(w_minY,y)
+                    wimg=img[w_minY:w_maxY+1,w_minX:w_maxX+1]
+                    img_save_path=os.path.join(img_dir,f"{fname}.png")
+                    cv2.imwrite(img_save_path,wimg)
+                    filepaths.append(img_save_path)
+                    words.append(text)
+                    fname+=1
+            except Exception as e:
+                LOG_INFO(f"{text}-{os.path.basename(img_path)}")
+                LOG_INFO(e,"red")
+        
     # dictionary of lists 
     _dict = {'filepath': filepaths, 'word': words} 
     df = pd.DataFrame(_dict)
