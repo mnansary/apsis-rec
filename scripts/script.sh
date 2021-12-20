@@ -24,10 +24,10 @@ bh_ds="${ds_path}bh/"
 bs_ds="${ds_path}bs/"
 bn_pr_ds="${ds_path}bangla_printed/"
 en_pr_ds="${ds_path}english_printed/"
-bn_hr_ds="${ds_path}bangla_handwritten/"
 iit_bn_ds="${ds_path}bn/"
 
-en_hr_ds="${ds_path}en_hw/"
+en_ds="${ds_path}en/"
+
 
 #-----------------------------------closed-----------------------------------------------
 #python synth.py $src_dir "bangla" "printed" $ds_path --num_samples $batch_sample 
@@ -40,14 +40,16 @@ en_hr_ds="${ds_path}en_hw/"
 #python datasets/boise_state.py $bs_ref $ds_path
 #python datasets/bn_htr.py $bh_ref $ds_path
 #python datasets/iit_indic.py $iit_bn_ref $ds_path
+python datasets/eng_hw.py $eng_hw_path $ds_path
 
 #-----------------------------------natrual---------------------------------------------
 #python datagen.py $bw_ds 
 #python datagen.py $bs_ds 
 #python datagen.py $bh_ds 
-python datagen.py $iit_bn_ds 
-python datagen.py $bn_pr_ds
-python datagen.py $en_pr_ds
+#python datagen.py $iit_bn_ds 
+#python datagen.py $bn_pr_ds
+#python datagen.py $en_pr_ds
+python datagen.py $en_ds
 #-----------------------------------natrual---------------------------------------------
 
 #-----------------------------------synthetic------------------------------------------

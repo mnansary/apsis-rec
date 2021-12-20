@@ -21,7 +21,7 @@ from tqdm import tqdm
 def main(args):
     data_dir    =   args.data_path
     save_path   =   args.save_path
-    save_path   =   create_dir(save_path,"en_hw")
+    save_path   =   create_dir(save_path,"en")
     img_dir     =   create_dir(save_path,"images")
     csv         =   os.path.join(save_path,"data.csv")
 
