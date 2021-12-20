@@ -50,19 +50,13 @@ iam_ds="${ds_path}iam/"
 #python datagen.py $bn_pr_ds
 #python datagen.py $en_pr_ds
 #python datagen.py $en_ds
-python datagen.py $iam_ds
+#python datagen.py $iam_ds
 #-----------------------------------natrual---------------------------------------------
 
 #-----------------------------------synthetic------------------------------------------
-#python datagen_synth.py $src_dir "bangla" "handwritten" $ds_path --num_samples 500000
+python nums.py $src_dir "bangla" "handwritten" $ds_path --num_samples 20000
+python nums.py $src_dir "english" "handwritten" $ds_path --num_samples 20000
 #-----------------------------------synthetic------------------------------------------
-#-----------------------------------bangla-----------------------------------------------
-
-#-----------------------------------english-----------------------------------------------
-#python datasets/eng_hw.py $eng_hw_path $ds_path
-#python datagen.py $en_hr_ds
-#python datagen_synth.py $src_dir "english" "printed" $ds_path --num_samples 10000000 --decomp 0
-#-----------------------------------english-----------------------------------------------
 
 
 
