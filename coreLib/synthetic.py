@@ -124,7 +124,6 @@ def createFontImageFromComps(font,comps):
     idx=np.where(img>0)
     y_min,y_max,x_min,x_max = np.min(idx[0]), np.max(idx[0]), np.min(idx[1]), np.max(idx[1])
     img=img[y_min:y_max,x_min:x_max]
-    img=255-img
     return img    
     
 def createRandomDictionary(valid_graphemes,num_samples):
@@ -235,6 +234,8 @@ def createSyntheticData(iden,
                 fsize=random.randint(8,256)
                 font=PIL.ImageFont.truetype(random.choice(ds.fonts),fsize)
                 img=createFontImageFromComps(font,comps) 
+                img=post_process_word_image(img)
+                img=np.squeeze(img)
                 if create_scene_data:
                     back=cv2.imread(random.choice(ds.backs))
                     back=cv2.resize(back,(int(20*fsize),int(20*fsize)))
@@ -243,7 +244,7 @@ def createSyntheticData(iden,
                     x=random.randint(0,wb-wi)
                     y=random.randint(0,hb-hi)
                     back=back[y:y+hi,x:x+wi]
-                    back[img<255]=randColor()
+                    back[img==255]=randColor()
                     img=np.copy(back)   
             else:
                 # image
@@ -255,7 +256,7 @@ def createSyntheticData(iden,
             words.append("".join(comps))
             fiden+=1
         except Exception as e:
-            LOG_INFO(e)
+           LOG_INFO(e)
     df=pd.DataFrame({"filepath":filepaths,"word":words})
     if return_df:
         return df,save.csv

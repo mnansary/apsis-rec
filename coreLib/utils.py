@@ -12,6 +12,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 import random
+from wand.image import Image as WImage
 #---------------------------------------------------------------
 def LOG_INFO(msg,mcolor='blue'):
     '''
@@ -46,6 +47,102 @@ def randColor(col=True):
 
 def random_exec(poplutation=[0,1],weights=[0.7,0.3],match=0):
     return random.choices(population=poplutation,weights=weights,k=1)[0]==match
+#--------------------
+# processing 
+#--------------------
+def get_warped_image(img,warp_vec,coord,max_warp_perc=20):
+    '''
+        returns warped image and new coords
+        args:
+            img      : image to warp
+            warp_vec : which vector to warp
+            coord    : list of current coords
+              
+    '''
+    height,width=img.shape
+ 
+    # construct dict warp
+    x1,y1=coord[0]
+    x2,y2=coord[1]
+    x3,y3=coord[2]
+    x4,y4=coord[3]
+    # warping calculation
+    xwarp=random.randint(0,max_warp_perc)/100
+    ywarp=random.randint(0,max_warp_perc)/100
+    # construct destination
+    dx=int(width*xwarp)
+    dy=int(height*ywarp)
+    # const
+    if warp_vec=="p1":
+        dst= [[dx,dy], [x2,y2],[x3,y3],[x4,y4]]
+    elif warp_vec=="p2":
+        dst=[[x1,y1],[x2-dx,dy],[x3,y3],[x4,y4]]
+    elif warp_vec=="p3":
+        dst= [[x1,y1],[x2,y2],[x3-dx,y3-dy],[x4,y4]]
+    else:
+        dst= [[x1,y1],[x2,y2],[x3,y3],[dx,y4-dy]]
+    M   = cv2.getPerspectiveTransform(np.float32(coord),np.float32(dst))
+    img = cv2.warpPerspective(img, M, (width,height),flags=cv2.INTER_NEAREST)
+    return img,dst
+
+def warp_data(img):
+    warp_types=["p1","p2","p3","p4"]
+    height,width=img.shape
+
+    coord=[[0,0], 
+        [width-1,0], 
+        [width-1,height-1], 
+        [0,height-1]]
+
+    # warp
+    for i in range(2):
+        if i==0:
+            idxs=[0,2]
+        else:
+            idxs=[1,3]
+        if random_exec():    
+            idx=random.choice(idxs)
+            img,coord=get_warped_image(img,warp_types[idx],coord)
+    return img
+
+
+def rotate_image(mat, angle_max=15):
+    """
+        Rotates an image (angle in degrees) and expands image to avoid cropping
+    """
+    angle=random.randint(-angle_max,angle_max)
+    height, width = mat.shape[:2] # image shape has 3 dimensions
+    image_center = (width/2, height/2) # getRotationMatrix2D needs coordinates in reverse order (width, height) compared to shape
+
+    rotation_mat = cv2.getRotationMatrix2D(image_center, angle, 1.)
+
+    # rotation calculates the cos and sin, taking absolutes of those.
+    abs_cos = abs(rotation_mat[0,0]) 
+    abs_sin = abs(rotation_mat[0,1])
+
+    # find the new width and height bounds
+    bound_w = int(height * abs_sin + width * abs_cos)
+    bound_h = int(height * abs_cos + width * abs_sin)
+
+    # subtract old image center (bringing image back to origo) and adding the new image center coordinates
+    rotation_mat[0, 2] += bound_w/2 - image_center[0]
+    rotation_mat[1, 2] += bound_h/2 - image_center[1]
+
+    # rotate image with the new bounds and translated rotation matrix
+    rotated_mat = cv2.warpAffine(mat, rotation_mat, (bound_w, bound_h),flags=cv2.INTER_NEAREST)
+    return rotated_mat
+
+def post_process_word_image(img):
+     # warp 20%
+    if random_exec(weights=[0.2,0.8]):
+        img=warp_data(img)
+        return img
+    # rotate/curve
+    if random_exec(weights=[0.5,0.5]):
+        img=rotate_image(img)
+        return img
+    return img
+
 #---------------------------------------------------------------
 # image utils
 #---------------------------------------------------------------
