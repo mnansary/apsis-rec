@@ -357,3 +357,105 @@ class GraphemeParser(object):
         except Exception as e:
             LOG_INFO(e)
             LOG_INFO(word)                        
+
+#----------------------------------------
+# noise utils
+#----------------------------------------
+class Modifier:
+    def __init__(self,
+                blur_kernel_size_max=6,
+                blur_kernel_size_min=3,
+                bi_filter_dim_min=7,
+                bi_filter_dim_max=12,
+                bi_filter_sigma_max=80,
+                bi_filter_sigma_min=70,
+                use_gaussblur=True,
+                use_brightness=True,
+                use_bifilter=True,
+                use_gaussnoise=True,
+                use_medianblur=True):
+
+        self.blur_kernel_size_max   =   blur_kernel_size_max
+        self.blur_kernel_size_min   =   blur_kernel_size_min
+        self.bi_filter_dim_min      =   bi_filter_dim_min
+        self.bi_filter_dim_max      =   bi_filter_dim_max
+        self.bi_filter_sigma_min    =   bi_filter_sigma_min
+        self.bi_filter_sigma_max    =   bi_filter_sigma_max
+        self.use_brightness         =   use_brightness
+        self.use_bifilter           =   use_bifilter
+        self.use_gaussnoise         =   use_gaussnoise
+        self.use_gaussblur          =   use_gaussblur
+        self.use_medianblur         =   use_medianblur
+        
+    def __initParams(self):
+        self.blur_kernel_size=random.randrange(self.blur_kernel_size_min,
+                                               self.blur_kernel_size_max, 
+                                               2)
+        self.bi_filter_dim   =random.randrange(self.bi_filter_dim_min,
+                                               self.bi_filter_dim_max, 
+                                               2)
+        self.bi_filter_sigma =random.randint(self.bi_filter_sigma_min,
+                                             self.bi_filter_sigma_max)
+        self.ops             =   [  self.__blur]
+        if self.use_medianblur:
+            self.ops.append(self.__medianBlur)
+        if self.use_gaussblur:
+            self.ops.append(self.__gaussBlur)
+        if self.use_gaussnoise:
+            self.ops.append(self.__gaussNoise)
+        if self.use_bifilter:
+            self.ops.append(self.__biFilter)
+        if self.use_brightness:
+            self.ops.append(self.__addBrightness)
+
+
+    def __blur(self,img):
+        return cv2.blur(img,
+                        (self.blur_kernel_size,
+                        self.blur_kernel_size),
+                         0)
+    def __gaussBlur(self,img):
+        return cv2.GaussianBlur(img,
+                                (self.blur_kernel_size,
+                                self.blur_kernel_size),
+                                0) 
+    def __medianBlur(self,img):
+        return  cv2.medianBlur(img,
+                               self.blur_kernel_size)
+    def __biFilter(self,img):
+        return cv2.bilateralFilter(img,
+                                   self.bi_filter_dim,
+                                   self.bi_filter_sigma,
+                                   self.bi_filter_sigma)
+
+    def __gaussNoise(self,image):
+        row,col,ch= image.shape
+        mean = 0
+        var = 0.1
+        sigma = var**0.5
+        gauss = np.random.normal(mean,sigma,(row,col,ch))
+        gauss = gauss.reshape(row,col,ch)
+        image = image+gauss
+        return image.astype("uint8")
+    
+    def __addBrightness(self,image):    
+        ## Conversion to HLSmask
+        image_HLS = cv2.cvtColor(image,cv2.COLOR_RGB2HLS)     
+        image_HLS = np.array(image_HLS, dtype = np.float64)
+        ## generates value between 0.5 and 1.5       
+        random_brightness_coefficient = np.random.uniform()+0.5  
+        ## scale pixel values up or down for channel 1(Lightness) 
+        image_HLS[:,:,1] = image_HLS[:,:,1]*random_brightness_coefficient
+        ##Sets all values above 255 to 255    
+        image_HLS[:,:,1][image_HLS[:,:,1]>255]  = 255     
+        image_HLS = np.array(image_HLS, dtype = np.uint8)    
+        ## Conversion to RGB
+        image_RGB = cv2.cvtColor(image_HLS,cv2.COLOR_HLS2RGB)     
+        return image_RGB
+    
+    def noise(self,img):
+        self.__initParams()
+        img=img.astype("uint8")
+        idx = random.choice(range(len(self.ops)))
+        img = self.ops.pop(idx)(img)
+        return img

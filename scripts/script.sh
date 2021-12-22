@@ -10,7 +10,7 @@ eng_hw_path="/home/apsisdev/ansary/DATASETS/RAW/eng_page/data/"
 iam_path="/home/apsisdev/ansary/DATASETS/RAW/IAM_DATA/"
 
 base_path="/home/apsisdev/ansary/DATASETS/APSIS/Recognition/"
-#base_path="/home/ansary/WORK/Work/APSIS/datasets/Recognition/"
+base_path="/home/ansary/WORK/Work/APSIS/datasets/Recognition/"
 
 save_path=$base_path
 src_dir="${base_path}source/"
@@ -47,10 +47,10 @@ bnn_ds="${ds_path}bnn/"
 #-----------------------------------natrual---------------------------------------------
 
 #-----------------------------------synthetic------------------------------------------
-python synth.py $src_dir "bangla" "printed" $ds_path --iden "bn_synth" --num_samples 150000
-python synth.py $src_dir "english" "printed" $ds_path --iden "en_synth" --num_samples 150000
-python nums.py $src_dir "bangla" "handwritten" $ds_path --num_samples 50000 --iden "bnn"
-python nums.py $src_dir "english" "handwritten" $ds_path --num_samples 50000 --iden "enn"
+python synth.py $src_dir "bangla" "printed" $ds_path --iden "bnp" --num_samples 250000 --scene False
+python synth.py $src_dir "english" "printed" $ds_path --iden "enp" --num_samples 250000 --scene False
+#python nums.py $src_dir "bangla" "handwritten" $ds_path --num_samples 50000 --iden "bnn"
+#python nums.py $src_dir "english" "handwritten" $ds_path --num_samples 50000 --iden "enn"
 # python datagen.py $enn_ds
 # python datagen.py $bnn_ds
 #-----------------------------------synthetic------------------------------------------

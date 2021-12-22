@@ -18,6 +18,8 @@ import PIL
 import PIL.Image , PIL.ImageDraw , PIL.ImageFont 
 tqdm.pandas()
 import matplotlib.pyplot as plt
+
+noise=Modifier()
 #--------------------
 # helpers
 #--------------------
@@ -245,7 +247,11 @@ def createSyntheticData(iden,
                     y=random.randint(0,hb-hi)
                     back=back[y:y+hi,x:x+wi]
                     back[img==255]=randColor()
-                    img=np.copy(back)   
+                    img=np.copy(back)
+                else:
+                    img=255-img   
+                    img=cv2.merge((img,img,img))
+                    img=noise.noise(img)
             else:
                 # image
                 img=createImgFromComps(df=ds.df,comps=comps,pad=pad)
