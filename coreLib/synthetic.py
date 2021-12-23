@@ -169,7 +169,8 @@ def createSyntheticData(iden,
                         use_all=True,
                         fname_offset=0,
                         return_df=False,
-                        create_scene_data=True):
+                        create_scene_data=True,
+                        exclude_punct=False):
     '''
         creates: 
             * handwriten word image
@@ -205,6 +206,8 @@ def createSyntheticData(iden,
             valid_graphemes=language.dict_graphemes
         elif use_only_numbers:
             valid_graphemes=language.numbers
+        if exclude_punct:
+            valid_graphemes=[grapheme for grapheme in valid_graphemes if grapheme not in language.punctuations]
     else:
         ds=DataSet(data_dir,language.iden)
         if use_all:
@@ -253,8 +256,19 @@ def createSyntheticData(iden,
                     img=cv2.merge((img,img,img))
                     img=noise.noise(img)
             else:
+                img_height=random.randint(8,128)
                 # image
                 img=createImgFromComps(df=ds.df,comps=comps,pad=pad)
+                img=255-img
+                h,w=img.shape
+                w_new=int(img_height* w/h) 
+                img=cv2.resize(img,(w_new,img_height))
+                img=post_process_word_image(img)
+                img=np.squeeze(img)
+                img=255-img
+                img=cv2.merge((img,img,img))
+                img=noise.noise(img)
+                
             # save
             fname=f"{fiden}.png"
             cv2.imwrite(os.path.join(save.img,fname),img)

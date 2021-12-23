@@ -30,6 +30,7 @@ def main(args):
     language    =   args.language
     data_type   =   args.data_type
     use_scene   =   args.scene
+    exclude_punct=  args.exclude_punct
     assert os.path.exists(os.path.join(data_dir,language)),"the specified language does not contain a valid graphems,numbers and fonts data"
     assert data_type in ["printed","handwritten"],"must be in ['printed','handwritten']"
     
@@ -49,7 +50,8 @@ def main(args):
                             data_type=data_type,
                             num_samples=num_samples,
                             pad_height=pad_height,
-                            create_scene_data=use_scene)
+                            create_scene_data=use_scene,
+                            exclude_punct=exclude_punct)
 #-----------------------------------------------------------------------------------
 
 if __name__=="__main__":
@@ -65,6 +67,7 @@ if __name__=="__main__":
     parser.add_argument("--pad_height",required=False,default=20,help ="pad height for each grapheme for alignment correction: default=20")
     parser.add_argument("--num_samples",required=False,default=100000,help ="number of samples to create when:default=100000")
     parser.add_argument("--scene",required=False,type=str2bool,default=True,help ="wheather to use scene data:default=True")
+    parser.add_argument("--exclude_punct",required=False,type=str2bool,default=False,help ="wheather to avoid punctuations :default=False")
     
     args = parser.parse_args()
     main(args)
