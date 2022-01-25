@@ -205,6 +205,7 @@ def createSyntheticData(iden,
     class save:    
         img=create_dir(save_dir,"images")
         csv=os.path.join(save_dir,"data.csv")
+        txt=os.path.join(save_dir,"data.txt")
     
     # dataset
     if data_type=="printed":
@@ -299,8 +300,11 @@ def createSyntheticData(iden,
             fname=f"{fiden}.png"
             cv2.imwrite(os.path.join(save.img,fname),img)
             filepaths.append(os.path.join(save.img,fname))
-            words.append("".join(comps))
+            word="".join(comps)
+            words.append(word)
             fiden+=1
+            with open(save.txt,"a+") as f:
+                f.write(f"{fiden}.png,{word}\n")
         except Exception as e:
            LOG_INFO(e)
     df=pd.DataFrame({"filepath":filepaths,"word":words})
