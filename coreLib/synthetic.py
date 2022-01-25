@@ -18,8 +18,9 @@ import PIL
 import PIL.Image , PIL.ImageDraw , PIL.ImageFont 
 tqdm.pandas()
 import matplotlib.pyplot as plt
-
+import math
 noise=Modifier()
+scene_noise=Modifier(use_brightness=False)
 #--------------------
 # helpers
 #--------------------
@@ -144,7 +145,16 @@ def createRandomDictionary(valid_graphemes,num_samples):
     for _ in tqdm(range(num_samples)):
         len_word=random.choices(population=[1,2,3,4,5,6,7,8,9,10],weights=[0.05,0.05,0.1,0.15,0.15,0.15,0.15,0.1,0.05,0.05],k=1)[0]
         _graphemes=[]
+        _space_added=False
         for _ in range(len_word):
+            # space
+            if random_exec(weights=[0.8,0.2],match=1) and not _space_added:
+                num_space=random.randint(0,3)
+                if num_space>0:
+                    for _ in range(num_space):
+                        _graphemes.append(" ")
+                _space_added=True
+            # grapheme
             _graphemes.append(random.choice(valid_graphemes))
         graphemes.append(_graphemes)
         word.append("".join(_graphemes))
@@ -242,21 +252,36 @@ def createSyntheticData(iden,
                 img=post_process_word_image(img)
                 img=np.squeeze(img)
                 if create_scene_data:
+                    # extend image
+                    if random_exec(match=1):
+                        hi,wi=img.shape
+                        ptype=random.choice(["tb","lr",None])
+                        pdim=math.ceil(0.01*wi*random.randint(1,10))
+                        img=padAllAround(img,pdim,0,pad_single=ptype)
+                        
+                    hi,wi=img.shape
                     back=cv2.imread(random.choice(ds.backs))
                     back=cv2.resize(back,(int(20*fsize),int(20*fsize)))
                     hb,wb,_=back.shape
-                    hi,wi=img.shape
                     x=random.randint(0,wb-wi)
                     y=random.randint(0,hb-hi)
                     back=back[y:y+hi,x:x+wi]
                     back[img==255]=randColor()
                     img=np.copy(back)
+                    img=scene_noise.noise(img)
                 else:
+                    #-----------------------------
+                    # TODO: noisy back
+                    #-----------------------------
                     img=255-img   
                     img=cv2.merge((img,img,img))
                     img=noise.noise(img)
+                
             else:
-                img_height=random.randint(8,128)
+                #-----------------------------
+                # TODO: noisy back
+                #-----------------------------
+                img_height=random.randint(12,128)
                 # image
                 img=createImgFromComps(df=ds.df,comps=comps,pad=pad)
                 img=255-img
@@ -268,7 +293,8 @@ def createSyntheticData(iden,
                 img=255-img
                 img=cv2.merge((img,img,img))
                 img=noise.noise(img)
-                
+
+            
             # save
             fname=f"{fiden}.png"
             cv2.imwrite(os.path.join(save.img,fname),img)

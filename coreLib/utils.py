@@ -106,7 +106,7 @@ def warp_data(img):
     return img
 
 
-def rotate_image(mat, angle_max=15):
+def rotate_image(mat, angle_max=5):
     """
         Rotates an image (angle in degrees) and expands image to avoid cropping
     """

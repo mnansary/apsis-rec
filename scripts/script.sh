@@ -2,12 +2,12 @@
 
 
 
-bw_ref="/home/apsisdev/ansary/DATASETS/RAW/bangla_writing/raw/raw/"
-bh_ref="/home/apsisdev/ansary/DATASETS/RAW/BN-HTR/"
-bs_ref="/home/apsisdev/ansary/DATASETS/RAW/BanglaC/README.txt"
-iit_path="/home/apsisdev/Rezwan/cvit_iiit-indic/"
-eng_hw_path="/home/apsisdev/ansary/DATASETS/RAW/eng_page/data/"
-iam_path="/home/apsisdev/ansary/DATASETS/RAW/IAM_DATA/"
+# bw_ref="/home/apsisdev/ansary/DATASETS/RAW/bangla_writing/raw/raw/"
+# bh_ref="/home/apsisdev/ansary/DATASETS/RAW/BN-HTR/"
+# bs_ref="/home/apsisdev/ansary/DATASETS/RAW/BanglaC/README.txt"
+# iit_path="/home/apsisdev/Rezwan/cvit_iiit-indic/"
+# eng_hw_path="/home/apsisdev/ansary/DATASETS/RAW/eng_page/data/"
+# iam_path="/home/apsisdev/ansary/DATASETS/RAW/IAM_DATA/"
 
 base_path="/home/apsisdev/ansary/DATASETS/APSIS/Recognition/"
 #base_path="/home/ansary/WORK/Work/APSIS/datasets/Recognition/"
@@ -17,18 +17,20 @@ src_dir="${base_path}source/"
 batch_sample=1000000
 #-----------------------------------------------------------------------------------------------
 ds_path="${save_path}datasets/"
-iit_bn_ref="${iit_path}bn/vocab.txt"
 
-bw_ds="${ds_path}bw/"
-bh_ds="${ds_path}bh/"
-bs_ds="${ds_path}bs/"
-bn_pr_ds="${ds_path}bangla_printed/"
-en_pr_ds="${ds_path}english_printed/"
-iit_bn_ds="${ds_path}bn/"
-en_ds="${ds_path}en/"
-iam_ds="${ds_path}iam/"
-enn_ds="${ds_path}enn/"
-bnn_ds="${ds_path}bnn/"
+# iit_bn_ref="${iit_path}bn/vocab.txt"
+# bw_ds="${ds_path}bw/"
+# bh_ds="${ds_path}bh/"
+# bs_ds="${ds_path}bs/"
+# iit_bn_ds="${ds_path}bn/"
+# en_ds="${ds_path}en/"
+# iam_ds="${ds_path}iam/"
+# enn_ds="${ds_path}enn/"
+# bnn_ds="${ds_path}bnn/"
+
+#bn_pr_ds="${ds_path}bangla_printed/"
+#en_pr_ds="${ds_path}english_printed/"
+
 #-----------------------------------natrual---------------------------------------------
 # python datasets/bangla_writing.py $bw_ref $ds_path
 # python datasets/boise_state.py $bs_ref $ds_path
@@ -47,10 +49,12 @@ bnn_ds="${ds_path}bnn/"
 #-----------------------------------natrual---------------------------------------------
 
 #-----------------------------------synthetic------------------------------------------
-python synth.py $src_dir "bangla" "printed" $ds_path --iden "bnp" --num_samples 500000 --scene False --exclude_punct True
-python synth.py $src_dir "english" "printed" $ds_path --iden "enp" --num_samples 500000 --scene False --exclude_punct True
-python nums.py $src_dir "bangla" "handwritten" $ds_path --num_samples 100000 --iden "bnn" 
-python nums.py $src_dir "english" "handwritten" $ds_path --num_samples 100000 --iden "enn"
+python synth.py $src_dir "bangla" "printed" $ds_path --iden "bn" --num_samples 1000000 --scene True --exclude_punct True
+python synth.py $src_dir "bangla" "printed" $ds_path --iden "bnp" --num_samples 100000 --scene True --exclude_punct False
+python synth.py $src_dir "english" "printed" $ds_path --iden "en" --num_samples 1000000 --scene True --exclude_punct True
+python synth.py $src_dir "english" "printed" $ds_path --iden "enp" --num_samples 100000 --scene True --exclude_punct False
+#python nums.py $src_dir "bangla" "handwritten" $ds_path --num_samples 100000 --iden "bnn" 
+#python nums.py $src_dir "english" "handwritten" $ds_path --num_samples 100000 --iden "enn"
 # python datagen.py $enn_ds
 # python datagen.py $bnn_ds
 #-----------------------------------synthetic------------------------------------------
