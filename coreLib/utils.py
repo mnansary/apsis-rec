@@ -326,7 +326,7 @@ class GraphemeParser(object):
             graphemes.append(grapheme)
         return graphemes
 
-    def process(self,word,return_graphemes=False):
+    def process(self,word,return_graphemes=True):
         '''
             processes a word for creating:
             if return_graphemes=False (default):

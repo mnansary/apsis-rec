@@ -17,6 +17,29 @@ tqdm.pandas()
 #--------------------
 not_found=[]
 
+def reset(df):
+    # sort df
+    df.dropna(inplace=True)
+    df.reset_index(drop=True,inplace=True) 
+    return df
+
+def cvt_str(x):
+    try:
+        return str(x)
+    except Exception as e:
+        return None
+
+def space_correction(graphemes):
+    for idx in range(len(graphemes)-1):
+        if graphemes[idx]==" " and graphemes[idx+1]==" ":
+                graphemes[idx]=None 
+    graphemes=[g for g in graphemes if g is not None]
+    for idx in range(len(graphemes)):
+        if graphemes[idx]==" ":graphemes[idx]="sep"
+    if graphemes[-1]=="sep":graphemes=graphemes[:-1]
+    if graphemes[0]=="sep":graphemes=graphemes[1:]
+    return graphemes
+
 def encode_label(x,vocab,max_len):
     '''
         encodes a label
@@ -151,7 +174,7 @@ def processImages(df,save_dir,img_dim,ptype="left"):
             # correct padding
             img,imask=correctPadding(img,img_dim,ptype=ptype)
             # mask
-            mask[:,imask:]=1
+            mask[:,imask:]=255
             datapath=os.path.join(img_dir,file_name)
             cv2.imwrite(datapath,img)
             cv2.imwrite(os.path.join(mask_dir,file_name),mask)
@@ -161,6 +184,7 @@ def processImages(df,save_dir,img_dim,ptype="left"):
             datapaths.append(None)
             LOG_INFO(e)
     df["datapath"]=datapaths
+    df=reset(df)
     return df
 #---------------------------------------------------------------
 def processLabels(df,vocab,max_len):
@@ -177,11 +201,17 @@ def processLabels(df,vocab,max_len):
     # process text
     
     ## components
-    df.word=df.word.progress_apply(lambda x:str(x))
+    df.word=df.word.progress_apply(lambda x:cvt_str(x))
+    df=reset(df)
+
     df["components"]=df.word.progress_apply(lambda x:GP.process(x))
-    df.dropna(inplace=True)
-    df.reset_index(drop=True,inplace=True)
+    df=reset(df)
+    
+    df["components"]=df["components"].progress_apply(lambda x:space_correction(x))
+    df=reset(df)
+    
     df["label"]=df.components.progress_apply(lambda x:encode_label(x,vocab,max_len))
+    df=reset(df)
     return df 
 
 #------------------------------------------------
@@ -198,7 +228,7 @@ def processData(data_dir,vocab,img_dim,max_len):
     save_dir=os.path.join(data_dir,"temp")
     # processing
     df=pd.read_csv(csv)
-    df.reset_index(drop=True,inplace=True)
+    df=reset(df)
     # images
     df=processImages(df,save_dir,img_dim)
     # labels
@@ -206,8 +236,7 @@ def processData(data_dir,vocab,img_dim,max_len):
     # save data
     cols=["filepath","word","datapath","label"]
     df=df[cols]
-    df.dropna(inplace=True)
-    df.reset_index(drop=True,inplace=True)
+    df=reset(df)
     df.to_csv(csv,index=False)
     LOG_INFO(f"Not Found:{not_found}")
     return df
