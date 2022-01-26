@@ -5,7 +5,9 @@
 #--------------------
 # imports
 #--------------------
-import os 
+import os
+from tkinter.messagebox import NO
+from xml.etree.ElementInclude import include 
 import cv2
 import numpy as np
 import random
@@ -41,13 +43,11 @@ def createImgFromComps(df,comps,pad):
     '''
     # get img_paths
     img_paths=[]
-    for comp in comps:
+    for idx,comp in enumerate(comps):
         cdf=df.loc[df.label==comp]
         cdf=cdf.sample(frac=1)
-        if len(cdf)==1:
-            img_paths.append(cdf.iloc[0,2])
-        else:
-            img_paths.append(cdf.iloc[random.randint(0,len(cdf)-1),2])
+        cdf.reset_index(drop=True,inplace=True)
+        img_paths.append(cdf.iloc[0,2])
     
     # get images
     imgs=[cv2.imread(img_path,0) for img_path in img_paths]
@@ -105,7 +105,7 @@ def createImgFromComps(df,comps,pad):
         cimgs.append(img)
 
     img=np.concatenate(cimgs,axis=1)
-    return img 
+    return img
 
 
 def createFontImageFromComps(font,comps):
@@ -129,7 +129,7 @@ def createFontImageFromComps(font,comps):
     img=img[y_min:y_max,x_min:x_max]
     return img    
     
-def createRandomDictionary(valid_graphemes,num_samples):
+def createRandomDictionary(valid_graphemes,num_samples,include_space=True):
     '''
         creates a randomized dictionary
         args:
@@ -147,13 +147,14 @@ def createRandomDictionary(valid_graphemes,num_samples):
         _graphemes=[]
         _space_added=False
         for _ in range(len_word):
-            # space
-            if random_exec(weights=[0.8,0.2],match=1) and not _space_added:
-                num_space=random.randint(0,3)
-                if num_space>0:
-                    for _ in range(num_space):
-                        _graphemes.append(" ")
-                _space_added=True
+            if include_space:
+                # space
+                if random_exec(weights=[0.8,0.2],match=1) and not _space_added:
+                    num_space=random.randint(0,3)
+                    if num_space>0:
+                        for _ in range(num_space):
+                            _graphemes.append(" ")
+                    _space_added=True
             # grapheme
             _graphemes.append(random.choice(valid_graphemes))
         graphemes.append(_graphemes)
@@ -219,7 +220,9 @@ def createSyntheticData(iden,
             valid_graphemes=language.numbers
         if exclude_punct:
             valid_graphemes=[grapheme for grapheme in valid_graphemes if grapheme not in language.punctuations]
+        include_space=True
     else:
+        include_space=False
         ds=DataSet(data_dir,language.iden)
         if use_all:
             valid_graphemes=ds.valid_graphemes
@@ -237,7 +240,7 @@ def createSyntheticData(iden,
             height          =pad_height   
 
     # save data
-    dictionary=createRandomDictionary(valid_graphemes,num_samples)
+    dictionary=createRandomDictionary(valid_graphemes,num_samples,include_space=include_space)
     # dataframe vars
     filepaths=[]
     words=[]
@@ -293,7 +296,7 @@ def createSyntheticData(iden,
                 img=np.squeeze(img)
                 img=255-img
                 img=cv2.merge((img,img,img))
-                img=noise.noise(img)
+                img=paper_noise(img)
 
             
             # save

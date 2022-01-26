@@ -459,3 +459,14 @@ class Modifier:
         idx = random.choice(range(len(self.ops)))
         img = self.ops.pop(idx)(img)
         return img
+
+mod_noise=Modifier(use_brightness=False,
+                   use_bifilter=False,
+                   use_gaussnoise=False)
+def paper_noise(img):
+    img=mod_noise.noise(img)
+    noise_type=random.choice(['gaussian','impulse','laplacian','multiplicative_gaussian','poisson','uniform'])
+    with WImage.from_array(img) as wimg:
+        wimg.noise(noise_type=noise_type,attenuate=0.5) 
+        wimg=np.array(wimg)
+    return wimg
