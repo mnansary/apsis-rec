@@ -53,7 +53,7 @@ ds_path="${save_path}datasets/"
 # python synth.py $src_dir "bangla" "printed" $ds_path --iden "bnp" --num_samples 100000 --scene True --exclude_punct False
 # python synth.py $src_dir "english" "printed" $ds_path --iden "en" --num_samples 1000000 --scene True --exclude_punct True
 # python synth.py $src_dir "english" "printed" $ds_path --iden "enp" --num_samples 100000 --scene True --exclude_punct False
-python synth.py $src_dir "english" "handwritten" $ds_path --iden "enh" --num_samples 1000000 
+#python synth.py $src_dir "english" "handwritten" $ds_path --iden "enh" --num_samples 1000000 
 python synth.py $src_dir "bangla" "handwritten" $ds_path --iden "bnh" --num_samples 1000000 
 
 #python nums.py $src_dir "bangla" "handwritten" $ds_path --num_samples 100000 --iden "bnn" 

@@ -30,15 +30,18 @@ def cvt_str(x):
         return None
 
 def space_correction(graphemes):
-    for idx in range(len(graphemes)-1):
-        if graphemes[idx]==" " and graphemes[idx+1]==" ":
-                graphemes[idx]=None 
-    graphemes=[g for g in graphemes if g is not None]
-    for idx in range(len(graphemes)):
-        if graphemes[idx]==" ":graphemes[idx]="sep"
-    if graphemes[-1]=="sep":graphemes=graphemes[:-1]
-    if graphemes[0]=="sep":graphemes=graphemes[1:]
-    return graphemes
+    try:
+        for idx in range(len(graphemes)-1):
+            if graphemes[idx]==" " and graphemes[idx+1]==" ":
+                    graphemes[idx]=None 
+        graphemes=[g for g in graphemes if g is not None]
+        for idx in range(len(graphemes)):
+            if graphemes[idx]==" ":graphemes[idx]="sep"
+        if graphemes[-1]=="sep":graphemes=graphemes[:-1]
+        if graphemes[0]=="sep":graphemes=graphemes[1:]
+        return graphemes
+    except Exception as e:
+        return None
 
 def encode_label(x,vocab,max_len):
     '''
@@ -148,44 +151,33 @@ def correctPadding(img,dim,ptype="central",pvalue=255):
     img=cv2.resize(img,(img_width,img_height),fx=0,fy=0, interpolation = cv2.INTER_NEAREST)
     return img,mask 
 #---------------------------------------------------------------
-def processImages(df,save_dir,img_dim,ptype="left"):
+def processImages(df,img_dim,ptype="left"):
     '''
         process a specific dataframe with filename,word,graphemes and mode
         args:
             df      :   the dataframe to process
-            save_dir:   path to save temp data
             img_dim :   tuple of (img_height,img_width)  
             ptype   :   type of padding to use
     '''
-    datapaths=[]
-    img_dir=os.path.join(save_dir,"image")
-    mask_dir=os.path.join(save_dir,"mask")
-
     for idx in tqdm(range(len(df))):
         try:
             # mask
             mask=np.zeros(img_dim)
             # path
             img_path    =   df.iloc[idx,0]
-            # filename
-            file_name   =   os.path.basename(img_path)
+            datapath    =   df.iloc[idx,-1]
             # read image
             img=cv2.imread(img_path)
             # correct padding
             img,imask=correctPadding(img,img_dim,ptype=ptype)
             # mask
             mask[:,imask:]=255
-            datapath=os.path.join(img_dir,file_name)
             cv2.imwrite(datapath,img)
-            cv2.imwrite(os.path.join(mask_dir,file_name),mask)
-            datapaths.append(datapath)
+            cv2.imwrite(datapath.replace("image","mask"),mask)
             
         except Exception as e:
-            datapaths.append(None)
             LOG_INFO(e)
-    df["datapath"]=datapaths
-    df=reset(df)
-    return df
+    
 #---------------------------------------------------------------
 def processLabels(df,vocab,max_len):
     '''
@@ -225,12 +217,16 @@ def processData(data_dir,vocab,img_dim,max_len):
             max_len     :   model max_len
     '''
     csv=os.path.join(data_dir,"data.csv")
-    save_dir=os.path.join(data_dir,"temp")
+    img_dir=os.path.join(data_dir,"temp","image")
     # processing
     df=pd.read_csv(csv)
     df=reset(df)
+    # datapath
+    df["datapath"]=df.index
+    df.datapath=df.datapath.progress_apply(lambda x: os.path.join(img_dir,f"{x}.png"))
+    df=reset(df)
     # images
-    df=processImages(df,save_dir,img_dim)
+    processImages(df,img_dim)
     # labels
     df=processLabels(df,vocab,max_len)
     # save data
