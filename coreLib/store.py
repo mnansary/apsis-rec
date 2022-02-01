@@ -42,26 +42,30 @@ def toTfrecord(df,rnum,rec_path):
         for idx in range(len(df)):
             # base
             img_path=df.iloc[idx,2]
-            # img
-            with(open(img_path,'rb')) as fid:
-                image_png_bytes=fid.read()
-            # feature desc
-            data ={ 'image':_bytes_feature(image_png_bytes)}
+            try:
+                
+                # img
+                with(open(img_path,'rb')) as fid:
+                    image_png_bytes=fid.read()
+                # feature desc
+                data ={ 'image':_bytes_feature(image_png_bytes)}
 
-            # mask       
-            mask_path=img_path.replace("image","mask")     
-            with(open(mask_path,'rb')) as fid:
-                mask_png_bytes=fid.read()
-            # feature desc
-            data['mask']=_bytes_feature(mask_png_bytes)
-            # label
-            data["label"]=_int64_list_feature(df.iloc[idx,-1]) 
+                # mask       
+                mask_path=img_path.replace("image","mask")     
+                with(open(mask_path,'rb')) as fid:
+                    mask_png_bytes=fid.read()
+                # feature desc
+                data['mask']=_bytes_feature(mask_png_bytes)
+                # label
+                data["label"]=_int64_list_feature(df.iloc[idx,-1]) 
 
-            
-            features=tf.train.Features(feature=data)
-            example= tf.train.Example(features=features)
-            serialized=example.SerializeToString()
-            writer.write(serialized)  
+                
+                features=tf.train.Features(feature=data)
+                example= tf.train.Example(features=features)
+                serialized=example.SerializeToString()
+                writer.write(serialized)  
+            except Exception as e:
+                print("# Missing:",img_path)
 
 def createRecords(data,save_path,tf_size=10240):
     '''

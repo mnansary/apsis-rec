@@ -6,8 +6,6 @@
 # imports
 #--------------------
 import os
-from tkinter.messagebox import NO
-from xml.etree.ElementInclude import include 
 import cv2
 import numpy as np
 import random
@@ -21,8 +19,8 @@ import PIL.Image , PIL.ImageDraw , PIL.ImageFont
 tqdm.pandas()
 import matplotlib.pyplot as plt
 import math
+from .processing import correctPadding
 noise=Modifier()
-scene_noise=Modifier(use_brightness=False)
 #--------------------
 # helpers
 #--------------------
@@ -172,6 +170,7 @@ def createSyntheticData(iden,
                         data_type,    
                         data_dir,
                         language,
+                        img_dim,
                         num_samples=100000,
                         comp_dim=64,
                         pad_height=20,
@@ -244,13 +243,14 @@ def createSyntheticData(iden,
     # dataframe vars
     filepaths=[]
     words=[]
+    imasks=[]
     fiden=0+fname_offset
     # loop
     for idx in tqdm(range(len(dictionary))):
         try:
             comps=dictionary.iloc[idx,1]
             if data_type=="printed":
-                fsize=random.randint(8,256)
+                fsize=random.randint(12,256)
                 font=PIL.ImageFont.truetype(random.choice(ds.fonts),fsize)
                 img=createFontImageFromComps(font,comps) 
                 img=post_process_word_image(img)
@@ -265,26 +265,20 @@ def createSyntheticData(iden,
                         
                     hi,wi=img.shape
                     back=cv2.imread(random.choice(ds.backs))
-                    back=cv2.resize(back,(int(20*fsize),int(20*fsize)))
+                    back=cv2.resize(back,(int(20*wi),int(20*hi)))
                     hb,wb,_=back.shape
                     x=random.randint(0,wb-wi)
                     y=random.randint(0,hb-hi)
                     back=back[y:y+hi,x:x+wi]
                     back[img==255]=randColor()
                     img=np.copy(back)
-                    img=scene_noise.noise(img)
+                    
                 else:
-                    #-----------------------------
-                    # TODO: noisy back
-                    #-----------------------------
-                    img=255-img   
-                    img=cv2.merge((img,img,img))
-                    img=noise.noise(img)
+                    img=255-img  
+                    img=paper_noise(img) 
+                    
                 
             else:
-                #-----------------------------
-                # TODO: noisy back
-                #-----------------------------
                 img_height=random.randint(12,128)
                 # image
                 img=createImgFromComps(df=ds.df,comps=comps,pad=pad)
@@ -295,22 +289,24 @@ def createSyntheticData(iden,
                 img=post_process_word_image(img)
                 img=np.squeeze(img)
                 img=255-img
-                img=cv2.merge((img,img,img))
                 img=paper_noise(img)
 
             
             # save
             fname=f"{fiden}.png"
+            img,imask=correctPadding(img,img_dim,ptype="left")
+            img=noise.noise(img)
             cv2.imwrite(os.path.join(save.img,fname),img)
             filepaths.append(os.path.join(save.img,fname))
             word="".join(comps)
             words.append(word)
+            imasks.append(imask)
             fiden+=1
             with open(save.txt,"a+") as f:
-                f.write(f"{fiden}.png,{word}\n")
+                f.write(f"{fiden}.png#,#{word}#,#{imask}\n")
         except Exception as e:
            LOG_INFO(e)
-    df=pd.DataFrame({"filepath":filepaths,"word":words})
+    df=pd.DataFrame({"filepath":filepaths,"word":words,"imask":imasks})
     if return_df:
         return df,save.csv
     else:

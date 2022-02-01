@@ -25,7 +25,10 @@ def reset(df):
 
 def cvt_str(x):
     try:
-        return str(x)
+        x=str(x)
+        x=x.strip()
+        x=x.replace(" ","")
+        return x
     except Exception as e:
         return None
 
@@ -159,25 +162,27 @@ def processImages(df,img_dim,ptype="left"):
             img_dim :   tuple of (img_height,img_width)  
             ptype   :   type of padding to use
     '''
-    for idx in tqdm(range(len(df))):
-        try:
-            # mask
-            mask=np.zeros(img_dim)
-            # path
-            img_path    =   df.iloc[idx,0]
-            datapath    =   df.iloc[idx,-1]
-            # read image
-            img=cv2.imread(img_path)
-            # correct padding
-            img,imask=correctPadding(img,img_dim,ptype=ptype)
-            # mask
-            mask[:,imask:]=255
-            cv2.imwrite(datapath,img)
-            cv2.imwrite(datapath.replace("image","mask"),mask)
-            
-        except Exception as e:
-            LOG_INFO(e)
-    
+    cols=[col for col in df.columns]
+    if "imask" not in cols:
+        imasks=[]
+        for idx in tqdm(range(len(df))):
+            try:
+                # path
+                img_path    =   df.iloc[idx,0]
+                datapath    =   df.iloc[idx,-1]
+                # read image
+                img=cv2.imread(img_path)
+                # correct padding
+                img,imask=correctPadding(img,img_dim,ptype=ptype)
+                cv2.imwrite(datapath,img)
+                imasks.append(imask)
+            except Exception as e:
+                imasks.append(None)
+                LOG_INFO(e)
+        df["imask"]=imasks
+        df=reset(df)
+        return df 
+        
 #---------------------------------------------------------------
 def processLabels(df,vocab,max_len):
     '''
@@ -197,9 +202,6 @@ def processLabels(df,vocab,max_len):
     df=reset(df)
 
     df["components"]=df.word.progress_apply(lambda x:GP.process(x))
-    df=reset(df)
-    
-    df["components"]=df["components"].progress_apply(lambda x:space_correction(x))
     df=reset(df)
     
     df["label"]=df.components.progress_apply(lambda x:encode_label(x,vocab,max_len))
@@ -226,11 +228,11 @@ def processData(data_dir,vocab,img_dim,max_len):
     df.datapath=df.datapath.progress_apply(lambda x: os.path.join(img_dir,f"{x}.png"))
     df=reset(df)
     # images
-    processImages(df,img_dim)
+    df=processImages(df,img_dim)
     # labels
     df=processLabels(df,vocab,max_len)
     # save data
-    cols=["filepath","word","datapath","label"]
+    cols=["filepath","word","imask","datapath","label"]
     df=df[cols]
     df=reset(df)
     df.to_csv(csv,index=False)

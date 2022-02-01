@@ -31,6 +31,9 @@ def main(args):
     data_type   =   args.data_type
     use_scene   =   args.scene
     exclude_punct=  args.exclude_punct
+    img_height  =   int(args.img_height)
+    img_width   =   int(args.img_width)
+    
     assert os.path.exists(os.path.join(data_dir,language)),"the specified language does not contain a valid graphems,numbers and fonts data"
     assert data_type in ["printed","handwritten"],"must be in ['printed','handwritten']"
     
@@ -39,6 +42,8 @@ def main(args):
     num_samples =   int(args.num_samples)
     iden        =   args.iden
     
+    img_dim=(img_height,img_width)
+
     if iden is None:
         iden=f"{language}_{data_type}"
     language=languages[language]
@@ -47,6 +52,7 @@ def main(args):
                             save_dir=save_path,
                             data_dir=data_dir,
                             language=language,
+                            img_dim=img_dim,
                             data_type=data_type,
                             num_samples=num_samples,
                             pad_height=pad_height,
@@ -68,6 +74,8 @@ if __name__=="__main__":
     parser.add_argument("--num_samples",required=False,default=100000,help ="number of samples to create when:default=100000")
     parser.add_argument("--scene",required=False,type=str2bool,default=True,help ="wheather to use scene data:default=True")
     parser.add_argument("--exclude_punct",required=False,type=str2bool,default=False,help ="wheather to avoid punctuations :default=False")
+    parser.add_argument("--img_height",required=False,default=64,help ="height for each grapheme: default=64")
+    parser.add_argument("--img_width",required=False,default=512,help ="width for each grapheme: default=512")
     
     args = parser.parse_args()
     main(args)
