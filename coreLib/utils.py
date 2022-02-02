@@ -285,6 +285,7 @@ class GraphemeParser(object):
 
                 r_decomp.append(sorted(list(first)))
                 comps = rest
+            
             # add    
             combs=[]
             for ridx in r_decomp:
@@ -293,20 +294,13 @@ class GraphemeParser(object):
                     comb+=decomp[i]
                 combs.append(comb)
                 for i in ridx:
-                    decomp[i]=comb
-                    
-            # new root based decomp
-            new_decomp=[]
-            for i in range(len(decomp)-1):
-                if decomp[i] not in combs:
-                    new_decomp.append(decomp[i])
-                else:
-                    if decomp[i]!=decomp[i+1]:
-                        new_decomp.append(decomp[i])
-
-            new_decomp.append(decomp[-1])#+add*connector
+                    if i==ridx[-1]:
+                        decomp[i]=comb
+                    else:
+                        decomp[i]=None
+            decomp=[d for d in decomp if d is not None]
             
-            return new_decomp
+            return decomp
         else:
             return decomp
 
@@ -339,6 +333,8 @@ class GraphemeParser(object):
         try:
             decomp=[ch for ch in word]
             decomp=self.get_root_from_decomp(decomp)
+            if debug:
+                print(decomp)        
             if return_graphemes:
                 return self.get_graphemes_from_decomp(decomp)
             else:
@@ -358,8 +354,8 @@ class GraphemeParser(object):
                 return components
         except Exception as e:
             if debug:
-                LOG_INFO(e)
-                LOG_INFO(word)                        
+                print(e)
+                print(word)                        
 
 #----------------------------------------
 # noise utils
