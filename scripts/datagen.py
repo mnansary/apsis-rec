@@ -40,18 +40,17 @@ def main(args):
     temp_dir=create_dir(data_dir,"temp")
     _=create_dir(temp_dir,"image")
     save_dir=create_dir(temp_dir,iden)
-    config_json  =   os.path.join(temp_dir,"config.json")
+    config_json  =   "../config.json"
     
     # processing
     df=processData(data_dir,vocab,img_dim,seq_max_len)
     # storing
-    createRecords(df,save_dir,tf_size=tf_size)
+    createRecords(df,save_dir,img_dim,down_factor,tf_size=tf_size)
     config={"vocab":vocab,
         "pos_max":seq_max_len,
         "img_height":img_height,
         "img_width" :img_width,
         "tf_size":tf_size,
-        "zip_iden":iden,
         "down_factor":down_factor}
 
     with open(config_json, 'w') as fp:

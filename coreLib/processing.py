@@ -9,6 +9,7 @@ import random
 import pandas as pd 
 import cv2
 import math
+import shutil
 from tqdm import tqdm
 from .utils import *
 tqdm.pandas()
@@ -182,7 +183,18 @@ def processImages(df,img_dim,ptype="left"):
         df["imask"]=imasks
         df=reset(df)
         return df 
-        
+    else:
+        for idx in tqdm(range(len(df))):
+            try:
+                # path
+                img_path    =   df.iloc[idx,0]
+                datapath    =   df.iloc[idx,-1]
+                shutil.copy(img_path,datapath)
+            except Exception as e:
+                df.iloc[idx,0]=None
+                LOG_INFO(e)
+        df=reset(df)
+        return df
 #---------------------------------------------------------------
 def processLabels(df,vocab,max_len):
     '''

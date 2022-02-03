@@ -12,6 +12,7 @@ import math
 import pandas as pd 
 import tensorflow as tf
 import numpy as np 
+import cv2
 from ast import literal_eval
 from tqdm.auto import tqdm
 from .utils import *
@@ -27,7 +28,16 @@ def _int64_list_feature(value):
     return tf.train.Feature(int64_list=tf.train.Int64List(value=value))
 
 
-def toTfrecord(df,rnum,rec_path):
+def get_mask(down_factor,mask):
+    h,w=mask.shape
+    h=h//down_factor
+    w=w//down_factor
+    mask=cv2.resize(mask,(w,h),fx=0,fy=0,interpolation=cv2.INTER_NEAREST)
+    mask=mask.flatten().tolist()
+    mask=[int(i) for i in mask]
+    return mask
+
+def toTfrecord(df,rnum,rec_path,img_dim,down_factor):
     '''
         args:
             df      :   the dataframe that contains the information to store
@@ -41,7 +51,12 @@ def toTfrecord(df,rnum,rec_path):
         
         for idx in range(len(df)):
             # base
-            img_path=df.iloc[idx,2]
+            imask   =df.iloc[idx,2]
+            img_path=df.iloc[idx,3]
+            
+            mask=np.zeros(img_dim)
+            mask[:,imask:]=1
+            mask=get_mask(down_factor,mask)
             try:
                 
                 # img
@@ -49,15 +64,10 @@ def toTfrecord(df,rnum,rec_path):
                     image_png_bytes=fid.read()
                 # feature desc
                 data ={ 'image':_bytes_feature(image_png_bytes)}
-
-                # mask       
-                mask_path=img_path.replace("image","mask")     
-                with(open(mask_path,'rb')) as fid:
-                    mask_png_bytes=fid.read()
-                # feature desc
-                data['mask']=_bytes_feature(mask_png_bytes)
+                # mask
+                data["mask"] =_int64_list_feature(mask)    
                 # label
-                data["label"]=_int64_list_feature(df.iloc[idx,-1]) 
+                data["label"]=_int64_list_feature(df.iloc[idx,4]) 
 
                 
                 features=tf.train.Features(feature=data)
@@ -67,7 +77,7 @@ def toTfrecord(df,rnum,rec_path):
             except Exception as e:
                 print("# Missing:",img_path)
 
-def createRecords(data,save_path,tf_size=10240):
+def createRecords(data,save_path,img_dim,down_factor,tf_size=10240):
     '''
         creates tf records:
         args:
@@ -85,7 +95,7 @@ def createRecords(data,save_path,tf_size=10240):
         df        =   data.iloc[idx:idx+tf_size] 
         df.reset_index(drop=True,inplace=True) 
         rnum      =   idx//tf_size
-        toTfrecord(df,rnum,save_path)
+        toTfrecord(df,rnum,save_path,img_dim,down_factor)
 
     
     
