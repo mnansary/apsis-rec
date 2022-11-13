@@ -3,7 +3,6 @@
 @author:MD.Nazmuddoha Ansary
 """
 from __future__ import print_function
-from cv2 import imshow
 #---------------------------------------------------------------
 # imports
 #---------------------------------------------------------------
